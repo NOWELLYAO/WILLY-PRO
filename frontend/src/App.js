@@ -10,7 +10,7 @@ const API = `${BACKEND_URL}/api`;
 const AuditSystem = () => {
   const [activeAuditTab, setActiveAuditTab] = useState('hydraulic');
   const [hydraulicAuditData, setHydraulicAuditData] = useState({
-    // Données installation existante
+    // =================== DONNÉES INSTALLATION ===================
     installation_age: '',
     installation_type: 'surface',
     pump_manufacturer: '',
@@ -20,39 +20,166 @@ const AuditSystem = () => {
     motor_power_rated: '',
     motor_current_rated: '',
     
-    // Conditions d'exploitation actuelles
-    current_flow_rate: '',
-    current_head: '',
-    current_efficiency: '',
-    operating_hours_daily: '',
-    operating_days_yearly: '',
+    // =================== PARAMÈTRES HYDRAULIQUES CRITIQUES ===================
+    // Débits - Comparaison actuel vs requis
+    current_flow_rate: '',          // Débit actuel (m³/h)
+    required_flow_rate: '',         // Débit requis (m³/h)
+    design_flow_rate: '',           // Débit nominal/design (m³/h)
+    max_flow_rate: '',              // Débit maximum possible (m³/h)
+    min_flow_rate: '',              // Débit minimum acceptable (m³/h)
     
-    // Mesures techniques relevées
-    suction_pressure: '',
-    discharge_pressure: '',
-    motor_current: '',
-    motor_voltage: '',
-    vibration_level: '',
-    noise_level: '',
-    temperature_motor: '',
-    temperature_bearing: '',
+    // HMT - Comparaison actuel vs requis
+    current_hmt: '',                // HMT actuel (m)
+    required_hmt: '',               // HMT requis (m)
+    design_hmt: '',                 // HMT nominal/design (m)
+    max_hmt: '',                    // HMT maximum (m)
+    static_head: '',                // Hauteur géométrique statique (m)
     
-    // Observations visuelles
-    leakage_present: false,
-    corrosion_level: 'none',
-    alignment_status: 'good',
-    coupling_condition: 'good',
-    foundation_status: 'good',
+    // Rendements critiques
+    current_efficiency: '',         // Rendement actuel pompe (%)
+    design_efficiency: '',          // Rendement nominal constructeur (%)
+    overall_efficiency: '',         // Rendement global installation (%)
+    target_efficiency: '',          // Rendement cible souhaité (%)
     
-    // Maintenance historique
-    last_maintenance: '',
-    maintenance_frequency: 'monthly',
-    replacement_parts: [],
+    // =================== PARAMÈTRES ÉLECTRIQUES CRITIQUES ===================
+    // Puissances
+    current_power_consumption: '',   // Puissance consommée actuelle (kW)
+    required_power: '',             // Puissance requise calculée (kW)
+    rated_motor_power: '',          // Puissance nominale moteur (kW)
+    hydraulic_power: '',            // Puissance hydraulique (kW)
     
-    // Problèmes signalés
-    reported_issues: [],
-    performance_degradation: false,
-    energy_consumption_increase: false
+    // Intensités
+    current_intensity: '',          // Intensité actuelle (A)
+    nominal_intensity: '',          // Intensité nominale (A)
+    startup_intensity: '',          // Intensité démarrage (A)
+    
+    // Paramètres électriques
+    voltage: '',                    // Tension (V)
+    power_factor: '',               // Facteur de puissance
+    frequency: '',                  // Fréquence (Hz)
+    motor_efficiency_class: 'IE3',  // Classe rendement moteur
+    
+    // =================== NPSH CRITIQUE ===================
+    npsh_available: '',             // NPSHd disponible (m)
+    npsh_required: '',              // NPSH requis constructeur (m)
+    npsh_margin: '',                // Marge NPSH sécurité (m)
+    suction_pressure_absolute: '',   // Pression absolue aspiration (bar)
+    vapor_pressure: '',             // Pression vapeur fluide (bar)
+    
+    // =================== MESURES TECHNIQUES AVANCÉES ===================
+    suction_pressure: '',           // Pression aspiration (bar)
+    discharge_pressure: '',         // Pression refoulement (bar)
+    differential_pressure: '',      // Pression différentielle (bar)
+    
+    // Vitesses et pertes
+    suction_velocity: '',           // Vitesse aspiration (m/s)
+    discharge_velocity: '',         // Vitesse refoulement (m/s)
+    total_head_loss: '',            // Pertes charge totales (m)
+    suction_head_loss: '',          // Pertes charge aspiration (m)
+    discharge_head_loss: '',        // Pertes charge refoulement (m)
+    
+    // Températures critiques
+    fluid_temperature: '',          // Température fluide (°C)
+    motor_temperature: '',          // Température moteur (°C)
+    bearing_temperature: '',        // Température paliers (°C)
+    ambient_temperature: '',        // Température ambiante (°C)
+    
+    // Vibrations et bruit (selon normes ISO)
+    vibration_level: '',            // Vibrations RMS (mm/s) - ISO 10816
+    noise_level: '',                // Niveau sonore (dB(A))
+    
+    // =================== FLUIDE ET CONDITIONS ===================
+    fluid_type: 'water',           // Type de fluide
+    fluid_density: '',             // Densité fluide (kg/m³)
+    fluid_viscosity: '',           // Viscosité dynamique (cP)
+    ph_level: '',                  // pH (pour fluides corrosifs)
+    
+    // =================== ÉTAT MÉCANIQUE DÉTAILLÉ ===================
+    pump_age: '',                  // Âge pompe (années)
+    operating_hours_total: '',     // Heures fonctionnement totales
+    operating_hours_daily: '',     // Heures fonctionnement/jour
+    operating_days_yearly: '',     // Jours fonctionnement/an
+    
+    // États mécaniques selon normes
+    vibration_severity: 'good',     // Sévérité vibrations (ISO 10816)
+    alignment_deviation: '',        // Défaut alignement (mm)
+    coupling_condition: 'good',     // État accouplement
+    bearing_condition: 'good',      // État roulements
+    seal_condition: 'good',         // État étanchéité
+    impeller_condition: 'good',     // État roue
+    volute_condition: 'good',       // État volute
+    shaft_condition: 'good',        // État arbre
+    
+    // Corrosion et usure
+    corrosion_level: 'none',        // Niveau corrosion
+    erosion_level: 'none',          // Niveau érosion
+    cavitation_damage: 'none',      // Dégâts cavitation
+    
+    // =================== CONTRÔLE ET RÉGULATION ===================
+    control_system: 'manual',       // Système contrôle
+    regulation_type: 'none',        // Type régulation
+    pressure_regulation: false,     // Régulation pression
+    flow_regulation: false,         // Régulation débit
+    variable_speed_drive: false,    // Variateur vitesse
+    soft_starter: false,           // Démarreur progressif
+    
+    // Instrumentation
+    pressure_gauges: false,         // Manomètres
+    flow_meter: false,             // Débitmètre
+    temperature_sensors: false,     // Sondes température
+    vibration_monitoring: false,    // Surveillance vibratoire
+    
+    // =================== MAINTENANCE ET HISTORIQUE ===================
+    last_maintenance_date: '',      // Date dernière maintenance
+    maintenance_frequency: 'quarterly', // Fréquence maintenance
+    maintenance_type: 'corrective', // Type maintenance
+    
+    // Historique pannes et réparations
+    recent_failures: [],            // Pannes récentes
+    replacement_parts_history: [], // Historique pièces changées
+    maintenance_cost_yearly: '',   // Coût maintenance annuel (€)
+    downtime_hours_yearly: '',     // Heures d'arrêt annuelles
+    
+    // =================== PROBLÈMES ET OBSERVATIONS ===================
+    // Performance
+    performance_degradation: false, // Dégradation performances
+    efficiency_drop: '',           // Chute rendement (%)
+    flow_reduction: '',            // Réduction débit (%)
+    head_reduction: '',            // Réduction HMT (%)
+    
+    // Problèmes mécaniques observés
+    unusual_noise: false,          // Bruits anormaux
+    excessive_vibration: false,    // Vibrations excessives
+    leakage_present: false,        // Fuites présentes
+    overheating: false,            // Surchauffe
+    cavitation_detected: false,    // Cavitation détectée
+    
+    // Problèmes électriques
+    motor_overload: false,         // Surcharge moteur
+    frequent_trips: false,         // Déclenchements fréquents
+    power_factor_low: false,       // Facteur puissance faible
+    voltage_unbalance: false,      // Déséquilibre tension
+    
+    // =================== OBJECTIFS ET CONTRAINTES ===================
+    audit_objectives: [],          // Objectifs audit
+    performance_targets: [],       // Cibles performance
+    budget_constraints: '',        // Contraintes budget (€)
+    timeline_constraints: '',      // Contraintes délai
+    safety_requirements: [],       // Exigences sécurité
+    environmental_constraints: [], // Contraintes environnementales
+    
+    // Disponibilité et redondance
+    criticality_level: 'medium',   // Niveau criticité
+    redundancy_available: false,   // Redondance disponible
+    backup_pump: false,            // Pompe secours
+    shutdown_window: 'weekend',    // Créneaux arrêt possible
+    
+    // =================== DONNÉES ÉCONOMIQUES ===================
+    energy_cost_kwh: '',          // Coût énergie (€/kWh)
+    annual_energy_cost: '',       // Coût énergie annuel (€)
+    annual_operating_cost: '',    // Coût exploitation annuel (€)
+    replacement_cost_estimate: '', // Coût remplacement estimé (€)
+    roi_target_years: '3',        // Objectif ROI (années)
   });
 
   const [energyAuditData, setEnergyAuditData] = useState({
