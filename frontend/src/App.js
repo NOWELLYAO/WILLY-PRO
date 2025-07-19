@@ -317,37 +317,204 @@ const AuditSystem = () => {
   ];
 
   return (
+    <div className="space-y-6">
+      <div className="flex space-x-1 mb-4">
+        <button
+          onClick={() => setActiveAuditTab('hydraulic')}
+          className={`px-4 py-2 rounded-lg font-medium ${
+            activeAuditTab === 'hydraulic' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600'
+          }`}
+        >
+          🔧 Audit Hydraulique
+        </button>
+        <button
+          onClick={() => setActiveAuditTab('energy')}
+          className={`px-4 py-2 rounded-lg font-medium ${
+            activeAuditTab === 'energy' ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-600'
+          }`}
+        >
+          ⚡ Audit Énergétique
+        </button>
+      </div>
 
-      {/* Équipements Détaillés */}
-      <div className="bg-green-50 p-6 rounded-lg">
-        <h3 className="text-lg font-semibold text-green-800 mb-4">⚙️ Caractéristiques Équipements</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Pompe */}
-          <div>
-            <h4 className="font-medium text-green-700 mb-3">Pompe</h4>
-            <div className="space-y-3">
+      {activeAuditTab === 'hydraulic' && (
+        <div className="space-y-6">
+          <h2 className="text-xl font-bold text-blue-800">Audit Hydraulique</h2>
+          
+          {/* Formulaire d'audit hydraulique */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Âge installation (années)</label>
+              <input
+                type="number"
+                value={hydraulicAuditData.installation_age}
+                onChange={(e) => setHydraulicAuditData(prev => ({...prev, installation_age: e.target.value}))}
+                className="w-full p-2 border border-gray-300 rounded-md"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Fabricant pompe</label>
               <input
                 type="text"
                 value={hydraulicAuditData.pump_manufacturer}
-                onChange={(e) => handleHydraulicDataChange('pump_manufacturer', e.target.value)}
+                onChange={(e) => setHydraulicAuditData(prev => ({...prev, pump_manufacturer: e.target.value}))}
                 className="w-full p-2 border border-gray-300 rounded-md"
-                placeholder="Fabricant (ex: Grundfos)"
               />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Modèle pompe</label>
               <input
                 type="text"
                 value={hydraulicAuditData.pump_model}
-                onChange={(e) => handleHydraulicDataChange('pump_model', e.target.value)}
+                onChange={(e) => setHydraulicAuditData(prev => ({...prev, pump_model: e.target.value}))}
                 className="w-full p-2 border border-gray-300 rounded-md"
-                placeholder="Modèle (ex: CR 10-3)"
               />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Rendement actuel (%)</label>
               <input
-                type="text"
-                value={hydraulicAuditData.pump_serial}
-                onChange={(e) => handleHydraulicDataChange('pump_serial', e.target.value)}
+                type="number"
+                value={hydraulicAuditData.current_efficiency}
+                onChange={(e) => setHydraulicAuditData(prev => ({...prev, current_efficiency: e.target.value}))}
                 className="w-full p-2 border border-gray-300 rounded-md"
-                placeholder="Numéro série"
               />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Vibrations (mm/s)</label>
               <input
+                type="number"
+                step="0.1"
+                value={hydraulicAuditData.vibration_level}
+                onChange={(e) => setHydraulicAuditData(prev => ({...prev, vibration_level: e.target.value}))}
+                className="w-full p-2 border border-gray-300 rounded-md"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Niveau corrosion</label>
+              <select
+                value={hydraulicAuditData.corrosion_level}
+                onChange={(e) => setHydraulicAuditData(prev => ({...prev, corrosion_level: e.target.value}))}
+                className="w-full p-2 border border-gray-300 rounded-md"
+              >
+                {corrosionLevels.map(level => (
+                  <option key={level.value} value={level.value}>{level.label}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+          
+          {/* Bouton analyse hydraulique */}
+          <div className="text-center">
+            <button
+              onClick={performExpertAuditAnalysis}
+              disabled={loadingAnalysis}
+              className={`px-8 py-3 text-white font-semibold rounded-lg ${
+                loadingAnalysis 
+                  ? 'bg-gray-400 cursor-not-allowed' 
+                  : 'bg-blue-600 hover:bg-blue-700'
+              }`}
+            >
+              {loadingAnalysis ? '🔄 Analyse en cours...' : '🚀 Lancer Analyse EXPERT'}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {activeAuditTab === 'energy' && (
+        <div className="space-y-6">
+          <h2 className="text-xl font-bold text-green-800">Audit Énergétique</h2>
+          
+          {/* Formulaire d'audit énergétique */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Tarif électricité (FCFA/kWh)</label>
+              <input
+                type="number"
+                value={energyAuditData.electricity_tariff}
+                onChange={(e) => setEnergyAuditData(prev => ({...prev, electricity_tariff: e.target.value}))}
+                className="w-full p-2 border border-gray-300 rounded-md"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Consommation mensuelle (kWh)</label>
+              <input
+                type="number"
+                value={energyAuditData.energy_monthly_kwh}
+                onChange={(e) => setEnergyAuditData(prev => ({...prev, energy_monthly_kwh: e.target.value}))}
+                className="w-full p-2 border border-gray-300 rounded-md"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Facteur puissance</label>
+              <input
+                type="number"
+                step="0.01"
+                value={energyAuditData.power_factor_measured}
+                onChange={(e) => setEnergyAuditData(prev => ({...prev, power_factor_measured: e.target.value}))}
+                className="w-full p-2 border border-gray-300 rounded-md"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Système de contrôle</label>
+              <select
+                value={energyAuditData.control_system}
+                onChange={(e) => setEnergyAuditData(prev => ({...prev, control_system: e.target.value}))}
+                className="w-full p-2 border border-gray-300 rounded-md"
+              >
+                {controlSystems.map(system => (
+                  <option key={system.value} value={system.value}>{system.label}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+          
+          {/* Cases à cocher */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <label className="flex items-center">
+              <input
+                type="checkbox"
+                checked={energyAuditData.variable_frequency_drive}
+                onChange={(e) => setEnergyAuditData(prev => ({...prev, variable_frequency_drive: e.target.checked}))}
+                className="mr-2"
+              />
+              <span className="text-sm">Variateur fréquence</span>
+            </label>
+            
+            <label className="flex items-center">
+              <input
+                type="checkbox"
+                checked={energyAuditData.soft_starter}
+                onChange={(e) => setEnergyAuditData(prev => ({...prev, soft_starter: e.target.checked}))}
+                className="mr-2"
+              />
+              <span className="text-sm">Démarreur progressif</span>
+            </label>
+          </div>
+          
+          {/* Bouton analyse énergétique */}
+          <div className="text-center">
+            <button
+              onClick={performExpertAuditAnalysis}
+              disabled={loadingAnalysis}
+              className={`px-8 py-3 text-white font-semibold rounded-lg ${
+                loadingAnalysis 
+                  ? 'bg-gray-400 cursor-not-allowed' 
+                  : 'bg-green-600 hover:bg-green-700'
+              }`}
+            >
+              {loadingAnalysis ? '🔄 Analyse en cours...' : '🚀 Lancer Analyse EXPERT'}
+            </button>
+          </div>
+        </div>
+      )}
                 type="number"
                 value={hydraulicAuditData.pump_year}
                 onChange={(e) => handleHydraulicDataChange('pump_year', e.target.value)}
