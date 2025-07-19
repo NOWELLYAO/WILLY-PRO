@@ -1009,20 +1009,20 @@ const AuditSystem = () => {
                         <div className="flex items-center justify-between mb-2">
                           <h4 className="font-semibold text-purple-700">Priorité Investissement</h4>
                           <div className={`px-3 py-1 rounded-full text-sm font-medium ${
-                            auditResults.investmentPriority.includes('Critique') 
+                            auditResults.investmentPriority && auditResults.investmentPriority.includes('Critique') 
                               ? 'bg-red-100 text-red-600' 
-                              : auditResults.investmentPriority.includes('Élevée') 
+                              : auditResults.investmentPriority && auditResults.investmentPriority.includes('Élevée') 
                                 ? 'bg-orange-100 text-orange-600' 
                                 : 'bg-green-100 text-green-600'
                           }`}>
-                            {auditResults.investmentPriority.includes('Critique') 
+                            {auditResults.investmentPriority && auditResults.investmentPriority.includes('Critique') 
                               ? 'CRITIQUE' 
-                              : auditResults.investmentPriority.includes('Élevée') 
+                              : auditResults.investmentPriority && auditResults.investmentPriority.includes('Élevée') 
                                 ? 'ÉLEVÉE' 
                                 : 'MODÉRÉE'}
                           </div>
                         </div>
-                        <div className="text-sm text-gray-700 font-medium">{auditResults.investmentPriority}</div>
+                        <div className="text-sm text-gray-700 font-medium">{auditResults.investmentPriority || 'Non défini'}</div>
                       </div>
                     </div>
 
