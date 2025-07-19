@@ -1112,28 +1112,31 @@ const AuditSystem = () => {
                         <div>
                           <h5 className="font-semibold text-gray-800 mb-3">🛠️ Plan d'Action Technique</h5>
                           <div className="space-y-4">
-                            {auditResults.hydraulicRecommendations.map((rec, index) => (
+                            {auditResults.hydraulicRecommendations && auditResults.hydraulicRecommendations.map((rec, index) => (
                               <div key={index} className="p-4 border rounded-lg bg-gray-50">
                                 <div className="flex items-center justify-between mb-2">
-                                  <span className="font-semibold text-gray-800">{rec.action}</span>
+                                  <span className="font-semibold text-gray-800">{rec.action || 'Action non définie'}</span>
                                   <span className={`px-2 py-1 rounded text-xs font-medium ${
                                     rec.priority === 'Haute' ? 'bg-red-200 text-red-800' : 
                                     rec.priority === 'Moyenne' ? 'bg-yellow-200 text-yellow-800' : 
                                     'bg-green-200 text-green-800'
                                   }`}>
-                                    {rec.priority}
+                                    {rec.priority || 'Non défini'}
                                   </span>
                                 </div>
-                                <div className="text-sm text-gray-600 mb-2">{rec.description}</div>
+                                <div className="text-sm text-gray-600 mb-2">{rec.description || 'Description non disponible'}</div>
                                 <div className="flex justify-between text-xs text-gray-500">
-                                  <span>💰 {rec.cost_range}</span>
-                                  <span>⏱️ {rec.timeline}</span>
+                                  <span>💰 {rec.cost_range || 'Non évalué'}</span>
+                                  <span>⏱️ {rec.timeline || 'Non défini'}</span>
                                 </div>
                                 <div className="text-xs text-green-600 mt-2">
-                                  ✅ {rec.benefits}
+                                  ✅ {rec.benefits || 'Bénéfices à évaluer'}
                                 </div>
                               </div>
                             ))}
+                            {(!auditResults.hydraulicRecommendations || auditResults.hydraulicRecommendations.length === 0) && (
+                              <div className="text-gray-500 text-sm italic">Aucune recommandation technique disponible</div>
+                            )}
                           </div>
                         </div>
                       </div>
