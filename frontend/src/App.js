@@ -1054,13 +1054,13 @@ const AuditSystem = () => {
                           💰 ESTIMATIONS COÛTS
                         </h4>
                         <div className="space-y-3">
-                          {Object.entries(auditResults.costEstimates).map(([category, cost]) => (
+                          {auditResults.costEstimates && Object.entries(auditResults.costEstimates).map(([category, cost]) => (
                             <div key={category} className="flex justify-between items-center">
                               <span className="text-gray-700 text-sm capitalize">
                                 {category.replace(/_/g, ' ')}
                               </span>
                               <span className="font-semibold text-yellow-600">
-                                {cost.toLocaleString()} €
+                                {cost && typeof cost === 'number' ? cost.toLocaleString() : '0'} €
                               </span>
                             </div>
                           ))}
@@ -1068,7 +1068,7 @@ const AuditSystem = () => {
                             <div className="flex justify-between items-center font-bold">
                               <span className="text-gray-800">TOTAL ESTIMÉ</span>
                               <span className="text-lg text-yellow-700">
-                                {Object.values(auditResults.costEstimates).reduce((a, b) => a + b, 0).toLocaleString()} €
+                                {auditResults.costEstimates ? Object.values(auditResults.costEstimates).reduce((a, b) => (a || 0) + (b || 0), 0).toLocaleString() : '0'} €
                               </span>
                             </div>
                           </div>
