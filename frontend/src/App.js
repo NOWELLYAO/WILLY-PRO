@@ -315,18 +315,8 @@ const AuditSystem = () => {
       benefits: 'Prévention pannes -60%, optimisation disponibilité'
     }
   ];
-            <select
-              value={hydraulicAuditData.environment_type}
-              onChange={(e) => handleHydraulicDataChange('environment_type', e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-md"
-            >
-              {environmentTypes.map(type => (
-                <option key={type.value} value={type.value}>{type.label}</option>
-              ))}
-            </select>
-          </div>
-        </div>
-      </div>
+
+  return (
 
       {/* Équipements Détaillés */}
       <div className="bg-green-50 p-6 rounded-lg">
