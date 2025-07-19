@@ -1182,19 +1182,31 @@ const AuditSystem = () => {
                       </h4>
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         <div className="text-center">
-                          <div className="text-3xl font-bold text-purple-600">{auditResults.paybackAnalysis.total_investment.toLocaleString()} €</div>
+                          <div className="text-3xl font-bold text-purple-600">
+                            {auditResults.paybackAnalysis && auditResults.paybackAnalysis.total_investment ? 
+                              auditResults.paybackAnalysis.total_investment.toLocaleString() : '0'} €
+                          </div>
                           <div className="text-sm text-gray-600">Investissement Total</div>
                         </div>
                         <div className="text-center">
-                          <div className="text-3xl font-bold text-green-600">{auditResults.paybackAnalysis.annual_savings.toLocaleString()} €</div>
+                          <div className="text-3xl font-bold text-green-600">
+                            {auditResults.paybackAnalysis && auditResults.paybackAnalysis.annual_savings ? 
+                              auditResults.paybackAnalysis.annual_savings.toLocaleString() : '0'} €
+                          </div>
                           <div className="text-sm text-gray-600">Économies Annuelles</div>
                         </div>
                         <div className="text-center">
-                          <div className="text-3xl font-bold text-blue-600">{auditResults.paybackAnalysis.simple_payback_months}</div>
+                          <div className="text-3xl font-bold text-blue-600">
+                            {auditResults.paybackAnalysis && auditResults.paybackAnalysis.simple_payback_months ? 
+                              auditResults.paybackAnalysis.simple_payback_months : '0'}
+                          </div>
                           <div className="text-sm text-gray-600">Retour (mois)</div>
                         </div>
                         <div className="text-center">
-                          <div className="text-3xl font-bold text-orange-600">{auditResults.paybackAnalysis.irr_percentage}%</div>
+                          <div className="text-3xl font-bold text-orange-600">
+                            {auditResults.paybackAnalysis && auditResults.paybackAnalysis.irr_percentage ? 
+                              auditResults.paybackAnalysis.irr_percentage : '0'}%
+                          </div>
                           <div className="text-sm text-gray-600">TIR (%)</div>
                         </div>
                       </div>
