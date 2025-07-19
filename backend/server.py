@@ -2360,6 +2360,186 @@ async def expert_analysis(input_data: ExpertAnalysisInput):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Erreur dans l'analyse expert: {str(e)}")
 
+# ============================================================================
+# AUDIT HYDRAULIQUE ET ÉNERGÉTIQUE - MODÈLES PYDANTIC
+# ============================================================================
+
+class HydraulicAuditInput(BaseModel):
+    # Informations installation
+    installation_age: float = Field(default=0, description="Âge de l'installation (années)")
+    installation_type: str = Field(default="surface", description="Type d'installation")
+    site_location: str = Field(default="", description="Localisation du site")
+    environment_type: str = Field(default="standard", description="Type d'environnement")
+    
+    # Équipements
+    pump_manufacturer: str = Field(default="", description="Fabricant pompe")
+    pump_model: str = Field(default="", description="Modèle pompe")
+    pump_serial: str = Field(default="", description="Numéro série pompe")
+    pump_year: Optional[int] = Field(default=None, description="Année fabrication pompe")
+    impeller_diameter: Optional[float] = Field(default=None, description="Diamètre roue (mm)")
+    motor_manufacturer: str = Field(default="", description="Fabricant moteur")
+    motor_power_rated: float = Field(default=0, description="Puissance nominale moteur (kW)")
+    motor_current_rated: float = Field(default=0, description="Courant nominal moteur (A)")
+    motor_efficiency_class: str = Field(default="IE3", description="Classe rendement moteur")
+    
+    # Conditions d'exploitation actuelles
+    current_flow_rate: float = Field(default=0, description="Débit actuel (m³/h)")
+    current_head: float = Field(default=0, description="Hauteur actuelle (m)")
+    current_efficiency: float = Field(default=0, description="Rendement actuel (%)")
+    operating_hours_daily: float = Field(default=8, description="Heures fonctionnement/jour")
+    operating_days_yearly: int = Field(default=250, description="Jours fonctionnement/an")
+    fluid_type: str = Field(default="water", description="Type de fluide")
+    fluid_temperature: float = Field(default=20, description="Température fluide (°C)")
+    
+    # Mesures techniques relevées
+    suction_pressure: float = Field(default=0, description="Pression aspiration (bar)")
+    discharge_pressure: float = Field(default=0, description="Pression refoulement (bar)")
+    motor_current_measured: float = Field(default=0, description="Courant mesuré (A)")
+    motor_voltage_measured: float = Field(default=0, description="Tension mesurée (V)")
+    vibration_level: float = Field(default=0, description="Niveau vibration (mm/s)")
+    noise_level: float = Field(default=0, description="Niveau sonore (dB)")
+    temperature_motor: float = Field(default=0, description="Température moteur (°C)")
+    temperature_bearing: float = Field(default=0, description="Température palier (°C)")
+    
+    # État mécanique
+    alignment_deviation: float = Field(default=0, description="Défaut alignement (mm)")
+    coupling_condition: str = Field(default="good", description="État accouplement")
+    bearing_condition: str = Field(default="good", description="État roulements")
+    seal_condition: str = Field(default="good", description="État étanchéité")
+    foundation_condition: str = Field(default="good", description="État fondation")
+    corrosion_level: str = Field(default="none", description="Niveau corrosion")
+    
+    # Observations visuelles
+    leakage_present: bool = Field(default=False, description="Fuites présentes")
+    cavitation_detected: bool = Field(default=False, description="Cavitation détectée")
+    unusual_noise: bool = Field(default=False, description="Bruit anormal")
+    excessive_vibration: bool = Field(default=False, description="Vibrations excessives")
+    
+    # Maintenance historique
+    last_maintenance_date: str = Field(default="", description="Dernière maintenance")
+    maintenance_frequency: str = Field(default="quarterly", description="Fréquence maintenance")
+    recent_repairs: List[str] = Field(default=[], description="Réparations récentes")
+    replacement_parts_history: List[str] = Field(default=[], description="Historique pièces")
+    
+    # Problèmes signalés
+    reported_issues: List[str] = Field(default=[], description="Problèmes signalés")
+    performance_degradation: bool = Field(default=False, description="Dégradation performances")
+    energy_consumption_increase: bool = Field(default=False, description="Augmentation consommation")
+    
+    # Système de contrôle
+    control_system_type: str = Field(default="manual", description="Type système contrôle")
+    automation_level: str = Field(default="basic", description="Niveau automatisation")
+    monitoring_systems: List[str] = Field(default=[], description="Systèmes surveillance")
+    
+    # Contraintes opérationnelles
+    critical_application: bool = Field(default=False, description="Application critique")
+    redundancy_available: bool = Field(default=False, description="Redondance disponible")
+    shutdown_windows: str = Field(default="weekends", description="Créneaux arrêt")
+    safety_requirements: List[str] = Field(default=[], description="Exigences sécurité")
+
+class EnergyAuditInput(BaseModel):
+    # Données tarifaires
+    electricity_tariff_standard: float = Field(default=0.15, description="Tarif électricité standard (€/kWh)")
+    electricity_tariff_peak: float = Field(default=0.20, description="Tarif heures pleines (€/kWh)")
+    electricity_tariff_offpeak: float = Field(default=0.10, description="Tarif heures creuses (€/kWh)")
+    demand_charge: float = Field(default=10, description="Tarif puissance (€/kW/mois)")
+    
+    # Profil d'exploitation
+    peak_hours_daily: float = Field(default=8, description="Heures pleines/jour")
+    off_peak_hours_daily: float = Field(default=16, description="Heures creuses/jour")
+    seasonal_variation_factor: float = Field(default=1.0, description="Facteur variation saisonnière")
+    load_factor: float = Field(default=0.75, description="Facteur de charge")
+    
+    # Mesures énergétiques
+    power_consumption_measured: float = Field(default=0, description="Puissance mesurée (kW)")
+    power_factor_measured: float = Field(default=0.85, description="Facteur puissance mesuré")
+    energy_monthly_kwh: float = Field(default=0, description="Consommation mensuelle (kWh)")
+    energy_cost_monthly: float = Field(default=0, description="Coût mensuel (€)")
+    
+    # Équipements auxiliaires
+    has_variable_frequency_drive: bool = Field(default=False, description="Variateur présent")
+    has_soft_starter: bool = Field(default=False, description="Démarreur progressif")
+    has_power_factor_correction: bool = Field(default=False, description="Compensation réactive")
+    has_energy_monitoring: bool = Field(default=False, description="Monitoring énergétique")
+    
+    # Objectifs d'amélioration
+    target_energy_savings_percent: float = Field(default=20, description="Objectif économie (%)")
+    payback_period_max_years: float = Field(default=3, description="Retour investissement max (ans)")
+    investment_budget_max: float = Field(default=50000, description="Budget max (€)")
+    
+    # Contraintes techniques
+    voltage_quality_issues: bool = Field(default=False, description="Problèmes qualité tension")
+    harmonic_distortion: float = Field(default=0, description="Distorsion harmonique (%)")
+    grid_instability: bool = Field(default=False, description="Instabilité réseau")
+
+class HydraulicAuditResult(BaseModel):
+    # Scores d'évaluation
+    overall_condition_score: float = Field(description="Score état général (0-100)")
+    hydraulic_performance_score: float = Field(description="Score performance hydraulique (0-100)")
+    mechanical_condition_score: float = Field(description="Score état mécanique (0-100)")
+    maintenance_score: float = Field(description="Score maintenance (0-100)")
+    
+    # Analyses détaillées
+    performance_analysis: Dict[str, Any] = Field(description="Analyse des performances")
+    mechanical_diagnosis: Dict[str, Any] = Field(description="Diagnostic mécanique")
+    maintenance_evaluation: Dict[str, Any] = Field(description="Évaluation maintenance")
+    
+    # Recommandations prioritaires
+    critical_actions: List[Dict[str, Any]] = Field(description="Actions critiques")
+    improvement_opportunities: List[Dict[str, Any]] = Field(description="Opportunités amélioration")
+    maintenance_recommendations: List[Dict[str, Any]] = Field(description="Recommandations maintenance")
+    
+    # Estimations coûts
+    repair_cost_estimates: Dict[str, float] = Field(description="Estimations coûts réparation")
+    upgrade_cost_estimates: Dict[str, float] = Field(description="Estimations coûts amélioration")
+    
+    # Planning d'intervention
+    implementation_roadmap: List[Dict[str, Any]] = Field(description="Feuille de route")
+    priority_classification: str = Field(description="Classification priorité")
+
+class EnergyAuditResult(BaseModel):
+    # Scores énergétiques
+    energy_efficiency_score: float = Field(description="Score efficacité énergétique (0-100)")
+    cost_optimization_score: float = Field(description="Score optimisation coûts (0-100)")
+    
+    # Analyses énergétiques
+    consumption_analysis: Dict[str, Any] = Field(description="Analyse consommation")
+    cost_breakdown: Dict[str, Any] = Field(description="Répartition coûts")
+    efficiency_assessment: Dict[str, Any] = Field(description="Évaluation efficacité")
+    
+    # Mesures d'amélioration
+    energy_saving_measures: List[Dict[str, Any]] = Field(description="Mesures économie énergie")
+    investment_analysis: Dict[str, Any] = Field(description="Analyse investissement")
+    payback_analysis: Dict[str, Any] = Field(description="Analyse retour investissement")
+    
+    # Projections
+    annual_savings_potential: float = Field(description="Potentiel économies annuelles (€)")
+    co2_reduction_potential: float = Field(description="Potentiel réduction CO2 (kg)")
+
+class ComprehensiveAuditResult(BaseModel):
+    hydraulic_audit: HydraulicAuditResult = Field(description="Résultats audit hydraulique")
+    energy_audit: EnergyAuditResult = Field(description="Résultats audit énergétique")
+    
+    # Synthèse globale
+    global_priority_score: float = Field(description="Score priorité globale (0-100)")
+    investment_recommendation: str = Field(description="Recommandation investissement")
+    total_savings_potential: float = Field(description="Potentiel total économies (€/an)")
+    
+    # Plan d'action intégré
+    integrated_action_plan: List[Dict[str, Any]] = Field(description="Plan action intégré")
+    business_case_summary: Dict[str, Any] = Field(description="Synthèse business case")
+
+@api_router.post("/expert-analysis", response_model=ExpertAnalysisResult)
+async def expert_analysis(input_data: ExpertAnalysisInput):
+    """
+    Analyse complète d'expert avec tous les calculs hydrauliques et électriques
+    """
+    try:
+        result = calculate_expert_analysis(input_data)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erreur dans l'analyse expert: {str(e)}")
+
 # Legacy functions for backward compatibility
 def calculate_cable_section(current: float, cable_length: float, voltage: int) -> float:
     """Calculate required cable section"""
