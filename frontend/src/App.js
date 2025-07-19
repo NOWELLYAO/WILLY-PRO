@@ -315,16 +315,6 @@ const AuditSystem = () => {
       benefits: 'Prévention pannes -60%, optimisation disponibilité'
     }
   ];
-            <input
-              type="text"
-              value={hydraulicAuditData.site_location}
-              onChange={(e) => handleHydraulicDataChange('site_location', e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-md"
-              placeholder="Ex: Usine Nord - Bâtiment A"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Type environnement</label>
             <select
               value={hydraulicAuditData.environment_type}
               onChange={(e) => handleHydraulicDataChange('environment_type', e.target.value)}
