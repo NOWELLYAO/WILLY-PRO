@@ -263,6 +263,35 @@ const AuditSystem = () => {
     }
   };
 
+  // Fonction de gestion des changements de valeurs
+  const handleHydraulicDataChange = (field, value) => {
+    setHydraulicAuditData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleEnergyDataChange = (field, value) => {
+    setEnergyAuditData(prev => ({ ...prev, [field]: value }));
+  };
+
+  // Fonctions de génération des analyses (conservation compatibilité)
+  const generateAuditResults = () => {
+    const hydraulicScore = calculateHydraulicScore();
+    const energyScore = calculateEnergyScore();
+    
+    return {
+      hydraulicScore,
+      energyScore,
+      overallScore: (hydraulicScore + energyScore) / 2,
+      priorityActions: generatePriorityActions(),
+      costEstimates: generateCostEstimates(),
+      improvementMeasures: generateImprovementMeasures(),
+      paybackAnalysis: generatePaybackAnalysis(),
+      investmentPriority: determineInvestmentPriority(),
+      implementationRoadmap: generateImplementationRoadmap(),
+      hydraulicFindings: generateHydraulicFindings(),
+      hydraulicRecommendations: generateHydraulicRecommendations()
+    };
+  };
+
   const generatePriorityActions = () => [
     'Remplacement immédiat des pièces critiques usées',
     'Correction de l\'alignement pompe-moteur', 
@@ -327,10 +356,11 @@ const AuditSystem = () => {
     // Pénalités basées sur les conditions
     if (hydraulicAuditData.corrosion_level === 'moderate') score -= 15;
     if (hydraulicAuditData.corrosion_level === 'severe') score -= 30;
-    if (hydraulicAuditData.alignment_status === 'poor') score -= 20;
     if (hydraulicAuditData.coupling_condition === 'poor') score -= 15;
     if (hydraulicAuditData.leakage_present) score -= 10;
     if (hydraulicAuditData.performance_degradation) score -= 25;
+    if (parseFloat(hydraulicAuditData.vibration_level) > 7.1) score -= 20;
+    if (parseFloat(hydraulicAuditData.current_efficiency) < 60) score -= 20;
     
     // Bonus pour bonne maintenance
     if (hydraulicAuditData.maintenance_frequency === 'monthly') score += 5;
@@ -343,14 +373,16 @@ const AuditSystem = () => {
     let score = 100;
     
     // Pénalités énergétiques
-    if (!energyAuditData.variable_frequency_drive && activeAuditTab === 'energy') score -= 25;
+    if (!energyAuditData.has_variable_frequency_drive) score -= 25;
     if (parseFloat(energyAuditData.power_factor_measured) < 0.9) score -= 15;
-    if (energyAuditData.control_system === 'basic') score -= 20;
+    if (energyAuditData.control_system_type === 'manual') score -= 20;
     if (energyAuditData.energy_consumption_increase) score -= 20;
+    if (parseFloat(energyAuditData.load_factor) < 0.7) score -= 10;
     
     // Bonus pour équipements efficaces
-    if (energyAuditData.variable_frequency_drive) score += 15;
+    if (energyAuditData.has_variable_frequency_drive) score += 15;
     if (energyAuditData.automation_level === 'advanced') score += 10;
+    if (energyAuditData.has_power_factor_correction) score += 5;
     
     return Math.max(30, Math.min(100, score));
   };
@@ -376,7 +408,7 @@ const AuditSystem = () => {
     },
     {
       category: 'État Mécanique',
-      finding: `Corrosion ${hydraulicAuditData.corrosion_level}, alignement ${hydraulicAuditData.alignment_status}`,
+      finding: `Corrosion ${hydraulicAuditData.corrosion_level}, alignement ${hydraulicAuditData.coupling_condition}`,
       severity: hydraulicAuditData.corrosion_level === 'severe' ? 'high' : 'medium',
       impact: 'Influence directe sur la fiabilité et la maintenance préventive'
     },
@@ -393,11 +425,19 @@ const AuditSystem = () => {
       priority: 'Haute',
       action: 'Remplacement des pièces d\'usure critiques',
       description: 'Remplacer les joints, roulements et garnitures mécaniques',
-      cost_range: '2 000 - 5 000 FCFA',
+      cost_range: '2 000 - 5 000 €',
       timeline: '1-2 semaines',
       benefits: 'Amélioration fiabilité +30%, réduction fuites'
     },
     {
+      priority: 'Moyenne',
+      action: 'Optimisation programme maintenance',
+      description: 'Passage à une maintenance préventive conditionnelle',
+      cost_range: '3 000 - 8 000 €',
+      timeline: '1-2 mois',
+      benefits: 'Réduction pannes -40%, optimisation coûts'
+    }
+  ];
       priority: 'Moyenne',
       action: 'Optimisation de l\'alignement pompe-moteur',
       description: 'Contrôle et correction de l\'alignement avec instruments de précision',
