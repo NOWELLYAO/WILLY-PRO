@@ -1086,7 +1086,7 @@ const AuditSystem = () => {
                         <div>
                           <h5 className="font-semibold text-gray-800 mb-3">📋 Constatations Techniques</h5>
                           <div className="space-y-3">
-                            {auditResults.hydraulicFindings.map((finding, index) => (
+                            {auditResults.hydraulicFindings && auditResults.hydraulicFindings.map((finding, index) => (
                               <div key={index} className="p-3 border-l-4 border-blue-400 bg-blue-50 rounded">
                                 <div className="font-medium text-blue-800">{finding.category}</div>
                                 <div className="text-sm text-gray-700 mt-1">{finding.finding}</div>
@@ -1102,6 +1102,9 @@ const AuditSystem = () => {
                                 </div>
                               </div>
                             ))}
+                            {(!auditResults.hydraulicFindings || auditResults.hydraulicFindings.length === 0) && (
+                              <div className="text-gray-500 text-sm italic">Aucun constat technique disponible</div>
+                            )}
                           </div>
                         </div>
 
