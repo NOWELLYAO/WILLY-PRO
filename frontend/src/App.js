@@ -254,19 +254,250 @@ const AuditSystem = () => {
     { value: 'flow_control', label: 'Régulation de débit' }
   ];
 
-  // Fonction d'analyse experte des données d'audit
+  // Fonction d'analyse experte qui utilise l'API backend
   const performExpertAuditAnalysis = async () => {
     setLoadingAnalysis(true);
     
     try {
-      // Simulation d'analyse experte (en réalité, cela utiliserait l'API backend)
-      await new Promise(resolve => setTimeout(resolve, 3000));
+      // Préparer les données pour l'API backend
+      const apiData = {
+        flow_rate: parseFloat(hydraulicAuditData.current_flow_rate) || 50,
+        fluid_type: hydraulicAuditData.fluid_type || 'water',
+        temperature: parseFloat(hydraulicAuditData.fluid_temperature) || 20,
+        suction_height: parseFloat(hydraulicAuditData.suction_height) || 3,
+        discharge_height: parseFloat(hydraulicAuditData.discharge_height) || 15,
+        suction_pipe_diameter: parseFloat(hydraulicAuditData.suction_pipe_diameter) || 100,
+        discharge_pipe_diameter: parseFloat(hydraulicAuditData.discharge_pipe_diameter) || 80,
+        suction_length: parseFloat(hydraulicAuditData.suction_length) || 10,
+        discharge_length: parseFloat(hydraulicAuditData.discharge_length) || 25,
+        total_length: (parseFloat(hydraulicAuditData.suction_length) || 10) + (parseFloat(hydraulicAuditData.discharge_length) || 25),
+        suction_material: hydraulicAuditData.suction_material || 'pvc',
+        discharge_material: hydraulicAuditData.discharge_material || 'steel', 
+        pump_efficiency: parseFloat(hydraulicAuditData.current_efficiency) || 75,
+        motor_efficiency: parseFloat(hydraulicAuditData.motor_efficiency) || 85,
+        voltage: parseFloat(hydraulicAuditData.voltage) || 400,
+        power_factor: parseFloat(hydraulicAuditData.power_factor) || 0.85,
+        starting_method: 'star_delta',
+        cable_length: 15,
+        cable_material: 'copper',
+        npsh_required: parseFloat(hydraulicAuditData.npsh_required) || 3.5,
+        useful_pressure: 2.5,
+        installation_type: 'surface',
+        suction_type: 'suction_lift',
+        operating_hours: parseFloat(hydraulicAuditData.operating_hours_daily) || 8,
+        electricity_cost: 0.15
+      };
+
+      console.log('Sending audit data to backend:', apiData);
+
+      // Appeler l'API backend pour l'analyse expert
+      const response = await axios.post(`${API}/expert-analysis`, apiData);
       
-      // Générer les résultats d'audit basés sur les données
-      const results = generateAuditResults();
+      console.log('Backend response received:', response.data);
+
+      // Transformer la réponse backend en format attendu par l'interface
+      const backendData = response.data;
+      
+      // Calculer les scores à partir des données backend
+      const hydraulicScore = backendData.overall_efficiency ? Math.min(100, backendData.overall_efficiency + 15) : 75;
+      const energyScore = backendData.electrical_analysis?.motor_efficiency ? backendData.electrical_analysis.motor_efficiency : 80;
+      const overallScore = (hydraulicScore + energyScore) / 2;
+
+      // Extraire les recommandations de matériaux de compatibilité chimique
+      const materialRecommendations = backendData.expert_recommendations?.filter(rec => rec.type === 'materials') || [];
+      
+      // Créer les actions prioritaires basées sur les recommandations backend
+      const priorityActions = [];
+      if (materialRecommendations.length > 0) {
+        materialRecommendations.forEach(rec => {
+          if (rec.solutions) {
+            priorityActions.push(...rec.solutions.slice(0, 2)); // Prendre les 2 premières solutions
+          }
+        });
+      }
+      
+      // Ajouter d'autres recommandations si disponibles
+      const otherRecs = backendData.expert_recommendations?.filter(rec => rec.type !== 'materials') || [];
+      otherRecs.forEach(rec => {
+        if (rec.solutions && priorityActions.length < 4) {
+          priorityActions.push(...rec.solutions.slice(0, 1));
+        }
+      });
+
+      // Générer les estimations de coûts basées sur la puissance et l'efficacité
+      const currentPower = backendData.power_calculations?.electrical_power || 15;
+      const efficiency = backendData.overall_efficiency || 75;
+      
+      const costEstimates = {
+        immediate_repairs: Math.round(currentPower * 300), // 300€/kW pour réparations
+        preventive_maintenance: Math.round(currentPower * 200), // 200€/kW pour maintenance
+        efficiency_upgrades: Math.round(currentPower * 500 * (85 - efficiency) / 10), // Basé sur gain d'efficacité
+        monitoring_systems: 8000 + Math.round(currentPower * 100) // Coût fixe + variable
+      };
+
+      // Créer les constatations hydrauliques basées sur les données backend
+      const hydraulicFindings = [];
+      
+      if (backendData.overall_efficiency < 70) {
+        hydraulicFindings.push({
+          category: 'Performance Hydraulique',
+          finding: `Rendement actuel de ${backendData.overall_efficiency?.toFixed(1)}% inférieur aux standards (>75%)`,
+          severity: backendData.overall_efficiency < 60 ? 'high' : 'medium',
+          impact: 'Augmentation significative de la consommation énergétique'
+        });
+      }
+
+      if (backendData.npshd_analysis?.cavitation_risk) {
+        hydraulicFindings.push({
+          category: 'Risque NPSH',
+          finding: 'Risque de cavitation détecté',
+          severity: 'high',
+          impact: 'Dégradation prématurée de la pompe et baisse de performances'
+        });
+      }
+
+      // Analyser les recommandations de compatibilité chimique
+      const compatibilityFindings = materialRecommendations.map(rec => ({
+        category: 'Compatibilité Chimique',
+        finding: rec.title || 'Analyse de compatibilité chimique effectuée',
+        severity: rec.solutions?.some(s => s.includes('⚠️')) ? 'high' : 'low',
+        impact: 'Impact sur la durabilité et la sécurité de l\'installation'
+      }));
+
+      hydraulicFindings.push(...compatibilityFindings);
+
+      // Créer les recommandations hydrauliques détaillées
+      const hydraulicRecommendations = [];
+      
+      // Recommandations basées sur l'efficacité
+      if (backendData.overall_efficiency < 75) {
+        hydraulicRecommendations.push({
+          priority: 'Haute',
+          action: 'Optimisation du rendement pompe',
+          description: `Améliorer le rendement de ${backendData.overall_efficiency?.toFixed(1)}% vers 75-80%`,
+          cost_range: `${Math.round(currentPower * 200)} - ${Math.round(currentPower * 400)} €`,
+          timeline: '2-4 semaines',
+          benefits: `Économie énergétique ${(75 - (backendData.overall_efficiency || 65)) * 2}% attendue`
+        });
+      }
+
+      // Recommandations de compatibilité chimique
+      materialRecommendations.forEach((rec, index) => {
+        if (rec.solutions && rec.solutions.length > 0) {
+          hydraulicRecommendations.push({
+            priority: rec.solutions.some(s => s.includes('⚠️')) ? 'Haute' : 'Moyenne',
+            action: rec.title || `Optimisation matériaux ${index + 1}`,
+            description: rec.solutions[0] || 'Amélioration compatibilité chimique',
+            cost_range: '1 000 - 15 000 €',
+            timeline: '1-3 semaines',
+            benefits: 'Amélioration durabilité et sécurité installation'
+          });
+        }
+      });
+
+      // Mesures d'amélioration avec ROI
+      const improvementMeasures = [];
+      
+      if (backendData.overall_efficiency < 80) {
+        const savingsPercent = Math.min(25, 80 - (backendData.overall_efficiency || 65));
+        improvementMeasures.push({
+          measure: 'Optimisation point de fonctionnement',
+          savings_percentage: savingsPercent,
+          cost: Math.round(currentPower * 400),
+          payback_months: Math.round(24 / savingsPercent * 10)
+        });
+      }
+
+      improvementMeasures.push({
+        measure: 'Installation variateur de fréquence',
+        savings_percentage: 20,
+        cost: Math.round(currentPower * 600),
+        payback_months: 18
+      });
+
+      if (backendData.electrical_analysis?.power_factor < 0.9) {
+        improvementMeasures.push({
+          measure: 'Correction facteur de puissance',
+          savings_percentage: 8,
+          cost: 5000,
+          payback_months: 30
+        });
+      }
+
+      // Analyse payback
+      const totalInvestment = Object.values(costEstimates).reduce((a, b) => a + b, 0);
+      const annualSavings = Math.round(currentPower * 8760 * 0.15 * 0.20); // 20% économie sur coût annuel
+      
+      const paybackAnalysis = {
+        total_investment: totalInvestment,
+        annual_savings: annualSavings,
+        simple_payback_months: totalInvestment > 0 ? (totalInvestment / annualSavings * 12) : 0,
+        npv_5_years: annualSavings * 5 - totalInvestment,
+        irr_percentage: annualSavings > 0 ? Math.round((annualSavings / totalInvestment) * 100) : 0
+      };
+
+      // Feuille de route implémentation
+      const implementationRoadmap = [
+        {
+          phase: 'Phase 1 (0-1 mois) - Actions Critiques',
+          actions: priorityActions.slice(0, 2)
+        },
+        {
+          phase: 'Phase 2 (1-3 mois) - Optimisations',
+          actions: ['Optimisation rendement', 'Amélioration régulation']
+        },
+        {
+          phase: 'Phase 3 (3-6 mois) - Modernisation',
+          actions: ['Installation monitoring', 'Formation équipes']
+        }
+      ];
+
+      // Déterminer la priorité d'investissement
+      let investmentPriority = 'Modérée - Optimisation continue';
+      if (overallScore < 60) {
+        investmentPriority = 'Critique - Intervention immédiate';
+      } else if (overallScore < 75) {
+        investmentPriority = 'Élevée - Planifier sous 6 mois';
+      }
+
+      // Assembler les résultats finaux
+      const results = {
+        hydraulicScore,
+        energyScore, 
+        overallScore,
+        priorityActions: priorityActions.length > 0 ? priorityActions : ['Surveillance performance', 'Maintenance préventive renforcée'],
+        costEstimates,
+        improvementMeasures,
+        paybackAnalysis,
+        investmentPriority,
+        implementationRoadmap,
+        hydraulicFindings: hydraulicFindings.length > 0 ? hydraulicFindings : [{
+          category: 'Analyse Générale',
+          finding: 'Installation en fonctionnement acceptable',
+          severity: 'low',
+          impact: 'Optimisations recommandées pour améliorer les performances'
+        }],
+        hydraulicRecommendations: hydraulicRecommendations.length > 0 ? hydraulicRecommendations : [{
+          priority: 'Moyenne',
+          action: 'Surveillance continue des performances',
+          description: 'Mise en place d\'un monitoring régulier des paramètres de fonctionnement',
+          cost_range: '2 000 - 5 000 €',
+          timeline: '2-4 semaines',
+          benefits: 'Prévention des pannes et optimisation continue'
+        }]
+      };
+
+      console.log('Final audit results:', results);
       setAuditResults(results);
+
     } catch (error) {
       console.error('Erreur analyse audit:', error);
+      
+      // En cas d'erreur, générer des résultats de base
+      const fallbackResults = generateAuditResults();
+      setAuditResults(fallbackResults);
+      
+      alert('Erreur lors de l\'analyse: ' + (error.response?.data?.detail || error.message));
     } finally {
       setLoadingAnalysis(false);
     }
