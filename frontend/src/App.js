@@ -438,16 +438,408 @@ const AuditSystem = () => {
       benefits: 'Réduction pannes -40%, optimisation coûts'
     }
   ];
-      priority: 'Moyenne',
-      action: 'Optimisation de l\'alignement pompe-moteur',
-      description: 'Contrôle et correction de l\'alignement avec instruments de précision',
-      cost_range: '500 - 1 500 FCFA',
-      timeline: '2-3 jours',
-      benefits: 'Réduction vibrations -40%, augmentation durée de vie +25%'
-    },
-    {
-      priority: 'Basse',
-      action: 'Amélioration du programme de maintenance préventive',
+  
+  // Interface de rendu pour l'audit hydraulique
+  const renderHydraulicAuditForm = () => (
+    <div className="space-y-8">
+      {/* Informations Installation */}
+      <div className="bg-blue-50 p-6 rounded-lg">
+        <h3 className="text-lg font-semibold text-blue-800 mb-4">📋 Informations Installation</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Âge installation (années)</label>
+            <input
+              type="number"
+              value={hydraulicAuditData.installation_age}
+              onChange={(e) => handleHydraulicDataChange('installation_age', e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded-md"
+              placeholder="Ex: 15"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Localisation site</label>
+            <input
+              type="text"
+              value={hydraulicAuditData.site_location}
+              onChange={(e) => handleHydraulicDataChange('site_location', e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded-md"
+              placeholder="Ex: Usine Nord - Bâtiment A"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Type environnement</label>
+            <select
+              value={hydraulicAuditData.environment_type}
+              onChange={(e) => handleHydraulicDataChange('environment_type', e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded-md"
+            >
+              {environmentTypes.map(type => (
+                <option key={type.value} value={type.value}>{type.label}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+      </div>
+
+      {/* Équipements Détaillés */}
+      <div className="bg-green-50 p-6 rounded-lg">
+        <h3 className="text-lg font-semibold text-green-800 mb-4">⚙️ Caractéristiques Équipements</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Pompe */}
+          <div>
+            <h4 className="font-medium text-green-700 mb-3">Pompe</h4>
+            <div className="space-y-3">
+              <input
+                type="text"
+                value={hydraulicAuditData.pump_manufacturer}
+                onChange={(e) => handleHydraulicDataChange('pump_manufacturer', e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded-md"
+                placeholder="Fabricant (ex: Grundfos)"
+              />
+              <input
+                type="text"
+                value={hydraulicAuditData.pump_model}
+                onChange={(e) => handleHydraulicDataChange('pump_model', e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded-md"
+                placeholder="Modèle (ex: CR 10-3)"
+              />
+              <input
+                type="text"
+                value={hydraulicAuditData.pump_serial}
+                onChange={(e) => handleHydraulicDataChange('pump_serial', e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded-md"
+                placeholder="Numéro série"
+              />
+              <input
+                type="number"
+                value={hydraulicAuditData.pump_year}
+                onChange={(e) => handleHydraulicDataChange('pump_year', e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded-md"
+                placeholder="Année fabrication"
+              />
+              <input
+                type="number"
+                value={hydraulicAuditData.impeller_diameter}
+                onChange={(e) => handleHydraulicDataChange('impeller_diameter', e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded-md"
+                placeholder="Diamètre roue (mm)"
+              />
+            </div>
+          </div>
+          
+          {/* Moteur */}
+          <div>
+            <h4 className="font-medium text-green-700 mb-3">Moteur</h4>
+            <div className="space-y-3">
+              <input
+                type="text"
+                value={hydraulicAuditData.motor_manufacturer}
+                onChange={(e) => handleHydraulicDataChange('motor_manufacturer', e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded-md"
+                placeholder="Fabricant moteur"
+              />
+              <input
+                type="number"
+                value={hydraulicAuditData.motor_power_rated}
+                onChange={(e) => handleHydraulicDataChange('motor_power_rated', e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded-md"
+                placeholder="Puissance nominale (kW)"
+              />
+              <input
+                type="number"
+                value={hydraulicAuditData.motor_current_rated}
+                onChange={(e) => handleHydraulicDataChange('motor_current_rated', e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded-md"
+                placeholder="Courant nominal (A)"
+              />
+              <select
+                value={hydraulicAuditData.motor_efficiency_class}
+                onChange={(e) => handleHydraulicDataChange('motor_efficiency_class', e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded-md"
+              >
+                {motorEfficiencyClasses.map(cls => (
+                  <option key={cls.value} value={cls.value}>{cls.label}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Conditions d'exploitation */}
+      <div className="bg-yellow-50 p-6 rounded-lg">
+        <h3 className="text-lg font-semibold text-yellow-800 mb-4">📊 Conditions d'Exploitation</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Débit actuel (m³/h)</label>
+            <input
+              type="number"
+              value={hydraulicAuditData.current_flow_rate}
+              onChange={(e) => handleHydraulicDataChange('current_flow_rate', e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded-md"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Hauteur actuelle (m)</label>
+            <input
+              type="number"
+              value={hydraulicAuditData.current_head}
+              onChange={(e) => handleHydraulicDataChange('current_head', e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded-md"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Rendement actuel (%)</label>
+            <input
+              type="number"
+              value={hydraulicAuditData.current_efficiency}
+              onChange={(e) => handleHydraulicDataChange('current_efficiency', e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded-md"
+              placeholder="Ex: 65"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Heures fonctionnement/jour</label>
+            <input
+              type="number"
+              value={hydraulicAuditData.operating_hours_daily}
+              onChange={(e) => handleHydraulicDataChange('operating_hours_daily', e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded-md"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Jours fonctionnement/an</label>
+            <input
+              type="number"
+              value={hydraulicAuditData.operating_days_yearly}
+              onChange={(e) => handleHydraulicDataChange('operating_days_yearly', e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded-md"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Type de fluide</label>
+            <select
+              value={hydraulicAuditData.fluid_type}
+              onChange={(e) => handleHydraulicDataChange('fluid_type', e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded-md"
+            >
+              {fluidTypes.map(fluid => (
+                <option key={fluid.value} value={fluid.value}>{fluid.label}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+      </div>
+
+      {/* Mesures Techniques Relevées */}
+      <div className="bg-red-50 p-6 rounded-lg">
+        <h3 className="text-lg font-semibold text-red-800 mb-4">🔧 Mesures Techniques Relevées</h3>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Pression aspiration (bar)</label>
+            <input
+              type="number"
+              step="0.1"
+              value={hydraulicAuditData.suction_pressure}
+              onChange={(e) => handleHydraulicDataChange('suction_pressure', e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded-md"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Pression refoulement (bar)</label>
+            <input
+              type="number"
+              step="0.1"
+              value={hydraulicAuditData.discharge_pressure}
+              onChange={(e) => handleHydraulicDataChange('discharge_pressure', e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded-md"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Courant moteur (A)</label>
+            <input
+              type="number"
+              step="0.1"
+              value={hydraulicAuditData.motor_current_measured}
+              onChange={(e) => handleHydraulicDataChange('motor_current_measured', e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded-md"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Tension moteur (V)</label>
+            <input
+              type="number"
+              value={hydraulicAuditData.motor_voltage_measured}
+              onChange={(e) => handleHydraulicDataChange('motor_voltage_measured', e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded-md"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Vibrations (mm/s)</label>
+            <input
+              type="number"
+              step="0.1"
+              value={hydraulicAuditData.vibration_level}
+              onChange={(e) => handleHydraulicDataChange('vibration_level', e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded-md"
+              placeholder="ISO 10816"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Bruit (dB)</label>
+            <input
+              type="number"
+              value={hydraulicAuditData.noise_level}
+              onChange={(e) => handleHydraulicDataChange('noise_level', e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded-md"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">T° moteur (°C)</label>
+            <input
+              type="number"
+              value={hydraulicAuditData.temperature_motor}
+              onChange={(e) => handleHydraulicDataChange('temperature_motor', e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded-md"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">T° paliers (°C)</label>
+            <input
+              type="number"
+              value={hydraulicAuditData.temperature_bearing}
+              onChange={(e) => handleHydraulicDataChange('temperature_bearing', e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded-md"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* État Mécanique */}
+      <div className="bg-purple-50 p-6 rounded-lg">
+        <h3 className="text-lg font-semibold text-purple-800 mb-4">🔩 État Mécanique</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Défaut alignement (mm)</label>
+            <input
+              type="number"
+              step="0.01"
+              value={hydraulicAuditData.alignment_deviation}
+              onChange={(e) => handleHydraulicDataChange('alignment_deviation', e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded-md"
+              placeholder="Tolérance: 0.1mm"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">État accouplement</label>
+            <select
+              value={hydraulicAuditData.coupling_condition}
+              onChange={(e) => handleHydraulicDataChange('coupling_condition', e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded-md"
+            >
+              {conditionStatuses.map(status => (
+                <option key={status.value} value={status.value}>{status.label}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">État roulements</label>
+            <select
+              value={hydraulicAuditData.bearing_condition}
+              onChange={(e) => handleHydraulicDataChange('bearing_condition', e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded-md"
+            >
+              {conditionStatuses.map(status => (
+                <option key={status.value} value={status.value}>{status.label}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">État étanchéité</label>
+            <select
+              value={hydraulicAuditData.seal_condition}
+              onChange={(e) => handleHydraulicDataChange('seal_condition', e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded-md"
+            >
+              {conditionStatuses.map(status => (
+                <option key={status.value} value={status.value}>{status.label}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Niveau corrosion</label>
+            <select
+              value={hydraulicAuditData.corrosion_level}
+              onChange={(e) => handleHydraulicDataChange('corrosion_level', e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded-md"
+            >
+              {corrosionLevels.map(level => (
+                <option key={level.value} value={level.value}>{level.label}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        {/* Observations booléennes */}
+        <div className="mt-4">
+          <h4 className="font-medium text-purple-700 mb-2">Observations</h4>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <label className="flex items-center">
+              <input
+                type="checkbox"
+                checked={hydraulicAuditData.leakage_present}
+                onChange={(e) => handleHydraulicDataChange('leakage_present', e.target.checked)}
+                className="mr-2"
+              />
+              <span className="text-sm">Fuites présentes</span>
+            </label>
+            <label className="flex items-center">
+              <input
+                type="checkbox"
+                checked={hydraulicAuditData.cavitation_detected}
+                onChange={(e) => handleHydraulicDataChange('cavitation_detected', e.target.checked)}
+                className="mr-2"
+              />
+              <span className="text-sm">Cavitation détectée</span>
+            </label>
+            <label className="flex items-center">
+              <input
+                type="checkbox"
+                checked={hydraulicAuditData.unusual_noise}
+                onChange={(e) => handleHydraulicDataChange('unusual_noise', e.target.checked)}
+                className="mr-2"
+              />
+              <span className="text-sm">Bruit anormal</span>
+            </label>
+            <label className="flex items-center">
+              <input
+                type="checkbox"
+                checked={hydraulicAuditData.excessive_vibration}
+                onChange={(e) => handleHydraulicDataChange('excessive_vibration', e.target.checked)}
+                className="mr-2"
+              />
+              <span className="text-sm">Vibrations excessives</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      {/* Bouton d'analyse */}
+      <div className="text-center">
+        <button
+          onClick={performHydraulicAuditAnalysis}
+          disabled={loadingAnalysis}
+          className={`px-8 py-3 text-white font-semibold rounded-lg ${
+            loadingAnalysis 
+              ? 'bg-gray-400 cursor-not-allowed' 
+              : 'bg-blue-600 hover:bg-blue-700'
+          }`}
+        >
+          {loadingAnalysis ? '🔄 Analyse en cours...' : '🚀 Lancer Analyse EXPERT Hydraulique'}
+        </button>
+      </div>
+    </div>
+  );
       description: 'Mise en place d\'un planning de maintenance prédictive',
       cost_range: '1 000 - 3 000 FCFA',
       timeline: '1 mois',
