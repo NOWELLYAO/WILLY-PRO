@@ -1034,7 +1034,7 @@ const AuditSystem = () => {
                           🚨 ACTIONS PRIORITAIRES
                         </h4>
                         <ul className="space-y-3">
-                          {auditResults.priorityActions.map((action, index) => (
+                          {auditResults.priorityActions && auditResults.priorityActions.map((action, index) => (
                             <li key={index} className="flex items-start">
                               <span className="flex-shrink-0 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs font-bold mr-3 mt-1">
                                 {index + 1}
@@ -1042,6 +1042,9 @@ const AuditSystem = () => {
                               <span className="text-gray-700 text-sm">{action}</span>
                             </li>
                           ))}
+                          {(!auditResults.priorityActions || auditResults.priorityActions.length === 0) && (
+                            <li className="text-gray-500 text-sm italic">Aucune action prioritaire détectée</li>
+                          )}
                         </ul>
                       </div>
 
