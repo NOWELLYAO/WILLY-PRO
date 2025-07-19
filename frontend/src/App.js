@@ -1160,6 +1160,155 @@ const AuditSystem = () => {
                 </div>
               </div>
 
+              {/* ===================== SECTION 4: DONNÉES SYSTÈME (Essentielles pour l'analyse) ===================== */}
+              <div className="bg-gradient-to-r from-gray-50 to-slate-50 rounded-lg p-6 border-l-4 border-gray-500">
+                <h4 className="font-semibold text-gray-800 mb-4 text-lg">⚙️ DONNÉES SYSTÈME ESSENTIELLES</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Type de Fluide</label>
+                    <select
+                      value={hydraulicAuditData.fluid_type}
+                      onChange={(e) => setHydraulicAuditData(prev => ({...prev, fluid_type: e.target.value}))}
+                      className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-gray-500"
+                    >
+                      <option value="water">Eau</option>
+                      <option value="oil">Huile hydraulique</option>
+                      <option value="acid">Solution acide</option>
+                      <option value="glycol">Éthylène glycol</option>
+                      <option value="seawater">Eau de mer</option>
+                      <option value="milk">Lait</option>
+                      <option value="gasoline">Essence</option>
+                      <option value="diesel">Gazole</option>
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Température Fluide (°C)</label>
+                    <input
+                      type="number"
+                      value={hydraulicAuditData.fluid_temperature}
+                      onChange={(e) => setHydraulicAuditData(prev => ({...prev, fluid_temperature: e.target.value}))}
+                      className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-gray-500"
+                      placeholder="Ex: 20"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Diamètre Aspiration (mm)</label>
+                    <input
+                      type="number"
+                      value={hydraulicAuditData.suction_pipe_diameter}
+                      onChange={(e) => setHydraulicAuditData(prev => ({...prev, suction_pipe_diameter: e.target.value}))}
+                      className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-gray-500"
+                      placeholder="Ex: 150"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Diamètre Refoulement (mm)</label>
+                    <input
+                      type="number"
+                      value={hydraulicAuditData.discharge_pipe_diameter}
+                      onChange={(e) => setHydraulicAuditData(prev => ({...prev, discharge_pipe_diameter: e.target.value}))}
+                      className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-gray-500"
+                      placeholder="Ex: 125"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Hauteur Aspiration (m)</label>
+                    <input
+                      type="number"
+                      step="0.1"
+                      value={hydraulicAuditData.suction_height}
+                      onChange={(e) => setHydraulicAuditData(prev => ({...prev, suction_height: e.target.value}))}
+                      className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-gray-500"
+                      placeholder="Ex: 3.0"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Hauteur Refoulement (m)</label>
+                    <input
+                      type="number"
+                      step="0.1"
+                      value={hydraulicAuditData.discharge_height}
+                      onChange={(e) => setHydraulicAuditData(prev => ({...prev, discharge_height: e.target.value}))}
+                      className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-gray-500"
+                      placeholder="Ex: 15.0"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Longueur Aspiration (m)</label>
+                    <input
+                      type="number"
+                      step="0.1"
+                      value={hydraulicAuditData.suction_length}
+                      onChange={(e) => setHydraulicAuditData(prev => ({...prev, suction_length: e.target.value}))}
+                      className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-gray-500"
+                      placeholder="Ex: 8.0"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Longueur Refoulement (m)</label>
+                    <input
+                      type="number"
+                      step="0.1"
+                      value={hydraulicAuditData.discharge_length}
+                      onChange={(e) => setHydraulicAuditData(prev => ({...prev, discharge_length: e.target.value}))}
+                      className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-gray-500"
+                      placeholder="Ex: 25.0"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Matériau Aspiration</label>
+                    <select
+                      value={hydraulicAuditData.suction_material}
+                      onChange={(e) => setHydraulicAuditData(prev => ({...prev, suction_material: e.target.value}))}
+                      className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-gray-500"
+                    >
+                      <option value="pvc">PVC</option>
+                      <option value="steel">Acier</option>
+                      <option value="stainless_steel_316">Inox 316L</option>
+                      <option value="pehd">PEHD</option>
+                      <option value="cast_iron">Fonte</option>
+                      <option value="copper">Cuivre</option>
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Matériau Refoulement</label>
+                    <select
+                      value={hydraulicAuditData.discharge_material}
+                      onChange={(e) => setHydraulicAuditData(prev => ({...prev, discharge_material: e.target.value}))}
+                      className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-gray-500"
+                    >
+                      <option value="steel">Acier</option>
+                      <option value="pvc">PVC</option>
+                      <option value="stainless_steel_316">Inox 316L</option>
+                      <option value="pehd">PEHD</option>
+                      <option value="cast_iron">Fonte</option>
+                      <option value="copper">Cuivre</option>
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Rendement Moteur (%)</label>
+                    <input
+                      type="number"
+                      step="0.1"
+                      value={hydraulicAuditData.motor_efficiency}
+                      onChange={(e) => setHydraulicAuditData(prev => ({...prev, motor_efficiency: e.target.value}))}
+                      className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-gray-500"
+                      placeholder="Ex: 85"
+                    />
+                  </div>
+                </div>
+              </div>
+
               {/* ===================== BOUTON ANALYSE EXPERT ===================== */}
               <div className="text-center bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-6">
                 <button
