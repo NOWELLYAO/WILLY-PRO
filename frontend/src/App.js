@@ -10,22 +10,15 @@ const API = `${BACKEND_URL}/api`;
 const AuditSystem = () => {
   const [activeAuditTab, setActiveAuditTab] = useState('hydraulic');
   const [hydraulicAuditData, setHydraulicAuditData] = useState({
-    // Informations installation
+    // Données installation existante
     installation_age: '',
     installation_type: 'surface',
-    site_location: '',
-    environment_type: 'standard',
-    
-    // Équipements - Informations détaillées
     pump_manufacturer: '',
     pump_model: '',
     pump_serial: '',
-    pump_year: '',
-    impeller_diameter: '',
     motor_manufacturer: '',
     motor_power_rated: '',
     motor_current_rated: '',
-    motor_efficiency_class: 'IE3',
     
     // Conditions d'exploitation actuelles
     current_flow_rate: '',
@@ -33,124 +26,76 @@ const AuditSystem = () => {
     current_efficiency: '',
     operating_hours_daily: '',
     operating_days_yearly: '',
-    fluid_type: 'water',
-    fluid_temperature: '',
     
-    // Mesures techniques relevées - Étendues
+    // Mesures techniques relevées
     suction_pressure: '',
     discharge_pressure: '',
-    motor_current_measured: '',
-    motor_voltage_measured: '',
+    motor_current: '',
+    motor_voltage: '',
     vibration_level: '',
     noise_level: '',
     temperature_motor: '',
     temperature_bearing: '',
     
-    // État mécanique - Détaillé
-    alignment_deviation: '',
-    coupling_condition: 'good',
-    bearing_condition: 'good',
-    seal_condition: 'good',
-    foundation_condition: 'good',
-    corrosion_level: 'none',
-    
-    // Observations visuelles - Enrichies
+    // Observations visuelles
     leakage_present: false,
-    cavitation_detected: false,
-    unusual_noise: false,
-    excessive_vibration: false,
+    corrosion_level: 'none',
+    alignment_status: 'good',
+    coupling_condition: 'good',
+    foundation_status: 'good',
     
-    // Maintenance historique - Complète
-    last_maintenance_date: '',
-    maintenance_frequency: 'quarterly',
-    recent_repairs: [],
-    replacement_parts_history: [],
+    // Maintenance historique
+    last_maintenance: '',
+    maintenance_frequency: 'monthly',
+    replacement_parts: [],
     
-    // Problèmes signalés - Étendus
+    // Problèmes signalés
     reported_issues: [],
     performance_degradation: false,
-    energy_consumption_increase: false,
-    
-    // Système de contrôle - Nouveau
-    control_system_type: 'manual',
-    automation_level: 'basic',
-    monitoring_systems: [],
-    
-    // Contraintes opérationnelles - Nouveau
-    critical_application: false,
-    redundancy_available: false,
-    shutdown_windows: 'weekends',
-    safety_requirements: []
+    energy_consumption_increase: false
   });
 
   const [energyAuditData, setEnergyAuditData] = useState({
-    // Données tarifaires - Étendues
-    electricity_tariff_standard: '0.15',
-    electricity_tariff_peak: '0.20',
-    electricity_tariff_offpeak: '0.10',
-    demand_charge: '10',
+    // Données énergétiques
+    electricity_tariff: '96',
+    peak_hours_tariff: '150',
+    off_peak_tariff: '75',
+    demand_charge: '8000',
     
-    // Profil d'exploitation - Détaillé
+    // Profil d'exploitation
     peak_hours_daily: '8',
     off_peak_hours_daily: '16',
-    seasonal_variation_factor: '1.0',
+    seasonal_variation: 'none',
     load_factor: '0.75',
     
-    // Mesures énergétiques - Complètes
+    // Mesures énergétiques
     power_consumption_measured: '',
     power_factor_measured: '',
     energy_monthly_kwh: '',
     energy_cost_monthly: '',
     
-    // Équipements auxiliaires - Étendus
-    has_variable_frequency_drive: false,
-    has_soft_starter: false,
-    has_power_factor_correction: false,
-    has_energy_monitoring: false,
+    // Équipements auxiliaires
+    control_system: 'basic',
+    variable_frequency_drive: false,
+    soft_starter: false,
+    pressure_tank: false,
+    automation_level: 'manual',
     
-    // Objectifs d'amélioration - Nouveaux
-    target_energy_savings_percent: '20',
-    payback_period_max_years: '3',
-    investment_budget_max: '',
+    // Objectifs d'amélioration
+    target_energy_savings: '20',
+    payback_period_max: '3',
+    investment_budget: '',
     
-    // Contraintes techniques - Nouveaux
-    voltage_quality_issues: false,
-    harmonic_distortion: '',
-    grid_instability: false
+    // Contraintes opérationnelles
+    shutdown_windows: 'weekends',
+    safety_requirements: [],
+    environmental_constraints: []
   });
 
   const [auditResults, setAuditResults] = useState(null);
   const [loadingAnalysis, setLoadingAnalysis] = useState(false);
 
-  // Options pour les dropdowns - Étendues
-  const environmentTypes = [
-    { value: 'standard', label: 'Standard' },
-    { value: 'corrosive', label: 'Corrosif' },
-    { value: 'explosive', label: 'Explosif (ATEX)' },
-    { value: 'food_grade', label: 'Alimentaire' },
-    { value: 'marine', label: 'Marin' },
-    { value: 'nuclear', label: 'Nucléaire' }
-  ];
-
-  const motorEfficiencyClasses = [
-    { value: 'IE1', label: 'IE1 (Standard)' },
-    { value: 'IE2', label: 'IE2 (Haute efficacité)' },
-    { value: 'IE3', label: 'IE3 (Premium)' },
-    { value: 'IE4', label: 'IE4 (Super Premium)' },
-    { value: 'IE5', label: 'IE5 (Ultra Premium)' }
-  ];
-
-  const fluidTypes = [
-    { value: 'water', label: 'Eau' },
-    { value: 'oil', label: 'Huile hydraulique' },
-    { value: 'acid', label: 'Solution acide' },
-    { value: 'glycol', label: 'Éthylène glycol' },
-    { value: 'seawater', label: 'Eau de mer' },
-    { value: 'milk', label: 'Lait' },
-    { value: 'gasoline', label: 'Essence' },
-    { value: 'diesel', label: 'Gazole' }
-  ];
-
+  // Options pour les dropdowns
   const corrosionLevels = [
     { value: 'none', label: 'Aucune corrosion visible' },
     { value: 'light', label: 'Corrosion légère' },
@@ -174,105 +119,32 @@ const AuditSystem = () => {
     { value: 'annual', label: 'Annuelle' }
   ];
 
-  const controlSystemTypes = [
-    { value: 'manual', label: 'Manuel' },
-    { value: 'semi_auto', label: 'Semi-automatique' },
-    { value: 'automatic', label: 'Automatique' },
-    { value: 'remote', label: 'Télécommandé' },
-    { value: 'scada', label: 'SCADA/Supervision' }
+  const controlSystems = [
+    { value: 'basic', label: 'Démarrage direct' },
+    { value: 'soft_starter', label: 'Démarreur progressif' },
+    { value: 'vfd', label: 'Variateur de fréquence' },
+    { value: 'pressure_control', label: 'Régulation de pression' },
+    { value: 'flow_control', label: 'Régulation de débit' }
   ];
 
-  const automationLevels = [
-    { value: 'basic', label: 'Basique' },
-    { value: 'intermediate', label: 'Intermédiaire' },
-    { value: 'advanced', label: 'Avancé' },
-    { value: 'smart', label: 'Intelligent (IoT)' }
-  ];
-
-  // Fonction d'analyse experte hydraulique
-  const performHydraulicAuditAnalysis = async () => {
+  // Fonction d'analyse experte des données d'audit
+  const performExpertAuditAnalysis = async () => {
     setLoadingAnalysis(true);
     
     try {
-      const response = await axios.post(`${API}/hydraulic-audit`, {
-        ...hydraulicAuditData,
-        // Conversion des valeurs string en number
-        installation_age: parseFloat(hydraulicAuditData.installation_age) || 0,
-        pump_year: parseInt(hydraulicAuditData.pump_year) || null,
-        impeller_diameter: parseFloat(hydraulicAuditData.impeller_diameter) || null,
-        motor_power_rated: parseFloat(hydraulicAuditData.motor_power_rated) || 0,
-        motor_current_rated: parseFloat(hydraulicAuditData.motor_current_rated) || 0,
-        current_flow_rate: parseFloat(hydraulicAuditData.current_flow_rate) || 0,
-        current_head: parseFloat(hydraulicAuditData.current_head) || 0,
-        current_efficiency: parseFloat(hydraulicAuditData.current_efficiency) || 0,
-        operating_hours_daily: parseFloat(hydraulicAuditData.operating_hours_daily) || 8,
-        operating_days_yearly: parseInt(hydraulicAuditData.operating_days_yearly) || 250,
-        fluid_temperature: parseFloat(hydraulicAuditData.fluid_temperature) || 20,
-        suction_pressure: parseFloat(hydraulicAuditData.suction_pressure) || 0,
-        discharge_pressure: parseFloat(hydraulicAuditData.discharge_pressure) || 0,
-        motor_current_measured: parseFloat(hydraulicAuditData.motor_current_measured) || 0,
-        motor_voltage_measured: parseFloat(hydraulicAuditData.motor_voltage_measured) || 0,
-        vibration_level: parseFloat(hydraulicAuditData.vibration_level) || 0,
-        noise_level: parseFloat(hydraulicAuditData.noise_level) || 0,
-        temperature_motor: parseFloat(hydraulicAuditData.temperature_motor) || 0,
-        temperature_bearing: parseFloat(hydraulicAuditData.temperature_bearing) || 0,
-        alignment_deviation: parseFloat(hydraulicAuditData.alignment_deviation) || 0
-      });
+      // Simulation d'analyse experte (en réalité, cela utiliserait l'API backend)
+      await new Promise(resolve => setTimeout(resolve, 3000));
       
-      setAuditResults({ type: 'hydraulic', data: response.data });
+      // Générer les résultats d'audit basés sur les données
+      const results = generateAuditResults();
+      setAuditResults(results);
     } catch (error) {
-      console.error('Erreur analyse audit hydraulique:', error);
-      alert('Erreur lors de l\'analyse hydraulique: ' + (error.response?.data?.detail || error.message));
+      console.error('Erreur analyse audit:', error);
     } finally {
       setLoadingAnalysis(false);
     }
   };
 
-  // Fonction d'analyse experte énergétique
-  const performEnergyAuditAnalysis = async () => {
-    setLoadingAnalysis(true);
-    
-    try {
-      const response = await axios.post(`${API}/energy-audit`, {
-        ...energyAuditData,
-        // Conversion des valeurs string en number
-        electricity_tariff_standard: parseFloat(energyAuditData.electricity_tariff_standard) || 0.15,
-        electricity_tariff_peak: parseFloat(energyAuditData.electricity_tariff_peak) || 0.20,
-        electricity_tariff_offpeak: parseFloat(energyAuditData.electricity_tariff_offpeak) || 0.10,
-        demand_charge: parseFloat(energyAuditData.demand_charge) || 10,
-        peak_hours_daily: parseFloat(energyAuditData.peak_hours_daily) || 8,
-        off_peak_hours_daily: parseFloat(energyAuditData.off_peak_hours_daily) || 16,
-        seasonal_variation_factor: parseFloat(energyAuditData.seasonal_variation_factor) || 1.0,
-        load_factor: parseFloat(energyAuditData.load_factor) || 0.75,
-        power_consumption_measured: parseFloat(energyAuditData.power_consumption_measured) || 0,
-        power_factor_measured: parseFloat(energyAuditData.power_factor_measured) || 0.85,
-        energy_monthly_kwh: parseFloat(energyAuditData.energy_monthly_kwh) || 0,
-        energy_cost_monthly: parseFloat(energyAuditData.energy_cost_monthly) || 0,
-        target_energy_savings_percent: parseFloat(energyAuditData.target_energy_savings_percent) || 20,
-        payback_period_max_years: parseFloat(energyAuditData.payback_period_max_years) || 3,
-        investment_budget_max: parseFloat(energyAuditData.investment_budget_max) || 50000,
-        harmonic_distortion: parseFloat(energyAuditData.harmonic_distortion) || 0
-      });
-      
-      setAuditResults({ type: 'energy', data: response.data });
-    } catch (error) {
-      console.error('Erreur analyse audit énergétique:', error);
-      alert('Erreur lors de l\'analyse énergétique: ' + (error.response?.data?.detail || error.message));
-    } finally {
-      setLoadingAnalysis(false);
-    }
-  };
-
-  // Fonction de gestion des changements de valeurs
-  const handleHydraulicDataChange = (field, value) => {
-    setHydraulicAuditData(prev => ({ ...prev, [field]: value }));
-  };
-
-  const handleEnergyDataChange = (field, value) => {
-    setEnergyAuditData(prev => ({ ...prev, [field]: value }));
-  };
-
-  // Fonctions de génération des analyses (conservation compatibilité)
   const generateAuditResults = () => {
     const hydraulicScore = calculateHydraulicScore();
     const energyScore = calculateEnergyScore();
@@ -356,11 +228,10 @@ const AuditSystem = () => {
     // Pénalités basées sur les conditions
     if (hydraulicAuditData.corrosion_level === 'moderate') score -= 15;
     if (hydraulicAuditData.corrosion_level === 'severe') score -= 30;
+    if (hydraulicAuditData.alignment_status === 'poor') score -= 20;
     if (hydraulicAuditData.coupling_condition === 'poor') score -= 15;
     if (hydraulicAuditData.leakage_present) score -= 10;
     if (hydraulicAuditData.performance_degradation) score -= 25;
-    if (parseFloat(hydraulicAuditData.vibration_level) > 7.1) score -= 20;
-    if (parseFloat(hydraulicAuditData.current_efficiency) < 60) score -= 20;
     
     // Bonus pour bonne maintenance
     if (hydraulicAuditData.maintenance_frequency === 'monthly') score += 5;
@@ -373,16 +244,14 @@ const AuditSystem = () => {
     let score = 100;
     
     // Pénalités énergétiques
-    if (!energyAuditData.has_variable_frequency_drive) score -= 25;
+    if (!energyAuditData.variable_frequency_drive && activeAuditTab === 'energy') score -= 25;
     if (parseFloat(energyAuditData.power_factor_measured) < 0.9) score -= 15;
-    if (energyAuditData.control_system_type === 'manual') score -= 20;
+    if (energyAuditData.control_system === 'basic') score -= 20;
     if (energyAuditData.energy_consumption_increase) score -= 20;
-    if (parseFloat(energyAuditData.load_factor) < 0.7) score -= 10;
     
     // Bonus pour équipements efficaces
-    if (energyAuditData.has_variable_frequency_drive) score += 15;
+    if (energyAuditData.variable_frequency_drive) score += 15;
     if (energyAuditData.automation_level === 'advanced') score += 10;
-    if (energyAuditData.has_power_factor_correction) score += 5;
     
     return Math.max(30, Math.min(100, score));
   };
@@ -408,7 +277,7 @@ const AuditSystem = () => {
     },
     {
       category: 'État Mécanique',
-      finding: `Corrosion ${hydraulicAuditData.corrosion_level}, alignement ${hydraulicAuditData.coupling_condition}`,
+      finding: `Corrosion ${hydraulicAuditData.corrosion_level}, alignement ${hydraulicAuditData.alignment_status}`,
       severity: hydraulicAuditData.corrosion_level === 'severe' ? 'high' : 'medium',
       impact: 'Influence directe sur la fiabilité et la maintenance préventive'
     },
@@ -431,33 +300,21 @@ const AuditSystem = () => {
     },
     {
       priority: 'Moyenne',
-      action: 'Optimisation programme maintenance',
-      description: 'Passage à une maintenance préventive conditionnelle',
-      cost_range: '3 000 - 8 000 €',
-      timeline: '1-2 mois',
-      benefits: 'Réduction pannes -40%, optimisation coûts'
+      action: 'Optimisation de l\'alignement pompe-moteur',
+      description: 'Contrôle et correction de l\'alignement avec instruments de précision',
+      cost_range: '500 - 1 500 €',
+      timeline: '2-3 jours',
+      benefits: 'Réduction vibrations -40%, augmentation durée de vie +25%'
+    },
+    {
+      priority: 'Basse',
+      action: 'Amélioration du programme de maintenance préventive',
+      description: 'Mise en place d\'un plan de maintenance systématique',
+      cost_range: '1 000 - 3 000 €',
+      timeline: '1 mois',
+      benefits: 'Prévention pannes -60%, optimisation disponibilité'
     }
   ];
-  
-  // Interface de rendu pour l'audit hydraulique
-  const renderHydraulicAuditForm = () => (
-    <div className="space-y-8">
-      {/* Informations Installation */}
-      <div className="bg-blue-50 p-6 rounded-lg">
-        <h3 className="text-lg font-semibold text-blue-800 mb-4">📋 Informations Installation</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Âge installation (années)</label>
-            <input
-              type="number"
-              value={hydraulicAuditData.installation_age}
-              onChange={(e) => handleHydraulicDataChange('installation_age', e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-md"
-              placeholder="Ex: 15"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Localisation site</label>
             <input
               type="text"
               value={hydraulicAuditData.site_location}
