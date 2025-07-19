@@ -1218,15 +1218,15 @@ const AuditSystem = () => {
                         🗓️ FEUILLE DE ROUTE IMPLÉMENTATION
                       </h4>
                       <div className="space-y-4">
-                        {auditResults.implementationRoadmap.map((phase, index) => (
+                        {auditResults.implementationRoadmap && auditResults.implementationRoadmap.map((phase, index) => (
                           <div key={index} className="flex items-start p-4 border border-indigo-200 rounded-lg bg-indigo-50">
                             <div className="flex-shrink-0 w-8 h-8 bg-indigo-500 text-white rounded-full flex items-center justify-center font-bold mr-4">
                               {index + 1}
                             </div>
                             <div className="flex-grow">
-                              <h5 className="font-semibold text-indigo-800">{phase.phase}</h5>
+                              <h5 className="font-semibold text-indigo-800">{phase.phase || `Phase ${index + 1}`}</h5>
                               <ul className="mt-2 space-y-1">
-                                {phase.actions.map((action, actionIndex) => (
+                                {phase.actions && phase.actions.map((action, actionIndex) => (
                                   <li key={actionIndex} className="text-sm text-gray-700 flex items-center">
                                     <span className="w-2 h-2 bg-indigo-400 rounded-full mr-2 flex-shrink-0"></span>
                                     {action}
@@ -1236,6 +1236,11 @@ const AuditSystem = () => {
                             </div>
                           </div>
                         ))}
+                        {(!auditResults.implementationRoadmap || auditResults.implementationRoadmap.length === 0) && (
+                          <div className="text-center text-gray-500 text-sm italic py-8">
+                            Feuille de route à définir selon les priorités identifiées
+                          </div>
+                        )}
                       </div>
                     </div>
 
