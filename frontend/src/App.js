@@ -956,6 +956,281 @@ const AuditSystem = () => {
                   Analyse complète avec recommandations professionnelles basées sur vos données
                 </p>
               </div>
+
+              {/* ===================== RÉSULTATS D'ANALYSE EXPERT - AFFICHAGE DANS LA MÊME PAGE ===================== */}
+              {auditResults && (
+                <div className="space-y-8 mt-8 animate-fade-in">
+                  <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-l-4 border-green-500 rounded-lg p-6">
+                    <h3 className="text-2xl font-bold text-green-800 mb-6 flex items-center">
+                      📊 RÉSULTATS ANALYSE EXPERT HYDRAULIQUE
+                      <span className="ml-3 px-3 py-1 bg-green-200 text-green-800 text-sm rounded-full">
+                        Score Global: {Math.round(auditResults.overallScore)}/100
+                      </span>
+                    </h3>
+
+                    {/* ===================== TABLEAU DE BORD PERFORMANCES ===================== */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                      {/* Score Hydraulique */}
+                      <div className="bg-white rounded-lg p-4 shadow-md">
+                        <div className="flex items-center justify-between mb-2">
+                          <h4 className="font-semibold text-blue-700">Performance Hydraulique</h4>
+                          <div className={`px-3 py-1 rounded-full text-sm font-medium ${getPerformanceRating(auditResults.hydraulicScore).bgColor} ${getPerformanceRating(auditResults.hydraulicScore).color}`}>
+                            {getPerformanceRating(auditResults.hydraulicScore).level}
+                          </div>
+                        </div>
+                        <div className="text-3xl font-bold text-blue-600">{Math.round(auditResults.hydraulicScore)}/100</div>
+                        <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+                          <div 
+                            className="bg-blue-600 h-2 rounded-full" 
+                            style={{ width: `${auditResults.hydraulicScore}%` }}
+                          ></div>
+                        </div>
+                      </div>
+
+                      {/* Score Énergétique */}
+                      <div className="bg-white rounded-lg p-4 shadow-md">
+                        <div className="flex items-center justify-between mb-2">
+                          <h4 className="font-semibold text-green-700">Efficacité Énergétique</h4>
+                          <div className={`px-3 py-1 rounded-full text-sm font-medium ${getPerformanceRating(auditResults.energyScore).bgColor} ${getPerformanceRating(auditResults.energyScore).color}`}>
+                            {getPerformanceRating(auditResults.energyScore).level}
+                          </div>
+                        </div>
+                        <div className="text-3xl font-bold text-green-600">{Math.round(auditResults.energyScore)}/100</div>
+                        <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+                          <div 
+                            className="bg-green-600 h-2 rounded-full" 
+                            style={{ width: `${auditResults.energyScore}%` }}
+                          ></div>
+                        </div>
+                      </div>
+
+                      {/* Priorité d'Investissement */}
+                      <div className="bg-white rounded-lg p-4 shadow-md">
+                        <div className="flex items-center justify-between mb-2">
+                          <h4 className="font-semibold text-purple-700">Priorité Investissement</h4>
+                          <div className={`px-3 py-1 rounded-full text-sm font-medium ${
+                            auditResults.investmentPriority.includes('Critique') 
+                              ? 'bg-red-100 text-red-600' 
+                              : auditResults.investmentPriority.includes('Élevée') 
+                                ? 'bg-orange-100 text-orange-600' 
+                                : 'bg-green-100 text-green-600'
+                          }`}>
+                            {auditResults.investmentPriority.includes('Critique') 
+                              ? 'CRITIQUE' 
+                              : auditResults.investmentPriority.includes('Élevée') 
+                                ? 'ÉLEVÉE' 
+                                : 'MODÉRÉE'}
+                          </div>
+                        </div>
+                        <div className="text-sm text-gray-700 font-medium">{auditResults.investmentPriority}</div>
+                      </div>
+                    </div>
+
+                    {/* ===================== ANALYSES DÉTAILLÉES ===================== */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                      {/* Actions Prioritaires */}
+                      <div className="bg-white rounded-lg p-6 shadow-md">
+                        <h4 className="font-bold text-red-700 mb-4 flex items-center">
+                          🚨 ACTIONS PRIORITAIRES
+                        </h4>
+                        <ul className="space-y-3">
+                          {auditResults.priorityActions.map((action, index) => (
+                            <li key={index} className="flex items-start">
+                              <span className="flex-shrink-0 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs font-bold mr-3 mt-1">
+                                {index + 1}
+                              </span>
+                              <span className="text-gray-700 text-sm">{action}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      {/* Estimations Coûts */}
+                      <div className="bg-white rounded-lg p-6 shadow-md">
+                        <h4 className="font-bold text-yellow-700 mb-4 flex items-center">
+                          💰 ESTIMATIONS COÛTS
+                        </h4>
+                        <div className="space-y-3">
+                          {Object.entries(auditResults.costEstimates).map(([category, cost]) => (
+                            <div key={category} className="flex justify-between items-center">
+                              <span className="text-gray-700 text-sm capitalize">
+                                {category.replace(/_/g, ' ')}
+                              </span>
+                              <span className="font-semibold text-yellow-600">
+                                {cost.toLocaleString()} €
+                              </span>
+                            </div>
+                          ))}
+                          <div className="border-t pt-2 mt-3">
+                            <div className="flex justify-between items-center font-bold">
+                              <span className="text-gray-800">TOTAL ESTIMÉ</span>
+                              <span className="text-lg text-yellow-700">
+                                {Object.values(auditResults.costEstimates).reduce((a, b) => a + b, 0).toLocaleString()} €
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* ===================== RECOMMANDATIONS HYDRAULIQUES EXPERTES ===================== */}
+                    <div className="mt-8 bg-white rounded-lg p-6 shadow-md">
+                      <h4 className="font-bold text-blue-700 mb-6 text-lg flex items-center">
+                        🔧 RECOMMANDATIONS HYDRAULIQUES D'EXPERT
+                      </h4>
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        {/* Constatations Techniques */}
+                        <div>
+                          <h5 className="font-semibold text-gray-800 mb-3">📋 Constatations Techniques</h5>
+                          <div className="space-y-3">
+                            {auditResults.hydraulicFindings.map((finding, index) => (
+                              <div key={index} className="p-3 border-l-4 border-blue-400 bg-blue-50 rounded">
+                                <div className="font-medium text-blue-800">{finding.category}</div>
+                                <div className="text-sm text-gray-700 mt-1">{finding.finding}</div>
+                                <div className="text-xs text-gray-600 mt-1">
+                                  <span className={`px-2 py-1 rounded text-xs ${
+                                    finding.severity === 'high' ? 'bg-red-200 text-red-800' : 
+                                    finding.severity === 'medium' ? 'bg-yellow-200 text-yellow-800' : 
+                                    'bg-green-200 text-green-800'
+                                  }`}>
+                                    {finding.severity === 'high' ? 'Critique' : finding.severity === 'medium' ? 'Modéré' : 'Faible'}
+                                  </span>
+                                  <span className="ml-2">{finding.impact}</span>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Recommandations Techniques */}
+                        <div>
+                          <h5 className="font-semibold text-gray-800 mb-3">🛠️ Plan d'Action Technique</h5>
+                          <div className="space-y-4">
+                            {auditResults.hydraulicRecommendations.map((rec, index) => (
+                              <div key={index} className="p-4 border rounded-lg bg-gray-50">
+                                <div className="flex items-center justify-between mb-2">
+                                  <span className="font-semibold text-gray-800">{rec.action}</span>
+                                  <span className={`px-2 py-1 rounded text-xs font-medium ${
+                                    rec.priority === 'Haute' ? 'bg-red-200 text-red-800' : 
+                                    rec.priority === 'Moyenne' ? 'bg-yellow-200 text-yellow-800' : 
+                                    'bg-green-200 text-green-800'
+                                  }`}>
+                                    {rec.priority}
+                                  </span>
+                                </div>
+                                <div className="text-sm text-gray-600 mb-2">{rec.description}</div>
+                                <div className="flex justify-between text-xs text-gray-500">
+                                  <span>💰 {rec.cost_range}</span>
+                                  <span>⏱️ {rec.timeline}</span>
+                                </div>
+                                <div className="text-xs text-green-600 mt-2">
+                                  ✅ {rec.benefits}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* ===================== MESURES D'AMÉLIORATION ===================== */}
+                    <div className="mt-8 bg-white rounded-lg p-6 shadow-md">
+                      <h4 className="font-bold text-green-700 mb-6 text-lg">
+                        📈 MESURES D'AMÉLIORATION & ROI
+                      </h4>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        {auditResults.improvementMeasures.map((measure, index) => (
+                          <div key={index} className="p-4 border border-green-200 rounded-lg bg-green-50">
+                            <h5 className="font-semibold text-green-800 mb-3">{measure.measure}</h5>
+                            <div className="space-y-2 text-sm">
+                              <div className="flex justify-between">
+                                <span className="text-gray-600">Économies:</span>
+                                <span className="font-semibold text-green-600">{measure.savings_percentage}%</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="text-gray-600">Investissement:</span>
+                                <span className="font-semibold text-blue-600">{measure.cost.toLocaleString()} €</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="text-gray-600">Retour:</span>
+                                <span className="font-semibold text-purple-600">{measure.payback_months} mois</span>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* ===================== ANALYSE RETOUR SUR INVESTISSEMENT ===================== */}
+                    <div className="mt-8 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-lg p-6 border-l-4 border-purple-500">
+                      <h4 className="font-bold text-purple-800 mb-6 text-lg">
+                        💎 ANALYSE FINANCIÈRE & ROI
+                      </h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div className="text-center">
+                          <div className="text-3xl font-bold text-purple-600">{auditResults.paybackAnalysis.total_investment.toLocaleString()} €</div>
+                          <div className="text-sm text-gray-600">Investissement Total</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-3xl font-bold text-green-600">{auditResults.paybackAnalysis.annual_savings.toLocaleString()} €</div>
+                          <div className="text-sm text-gray-600">Économies Annuelles</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-3xl font-bold text-blue-600">{auditResults.paybackAnalysis.simple_payback_months}</div>
+                          <div className="text-sm text-gray-600">Retour (mois)</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-3xl font-bold text-orange-600">{auditResults.paybackAnalysis.irr_percentage}%</div>
+                          <div className="text-sm text-gray-600">TIR (%)</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* ===================== FEUILLE DE ROUTE IMPLÉMENTATION ===================== */}
+                    <div className="mt-8 bg-white rounded-lg p-6 shadow-md">
+                      <h4 className="font-bold text-indigo-700 mb-6 text-lg">
+                        🗓️ FEUILLE DE ROUTE IMPLÉMENTATION
+                      </h4>
+                      <div className="space-y-4">
+                        {auditResults.implementationRoadmap.map((phase, index) => (
+                          <div key={index} className="flex items-start p-4 border border-indigo-200 rounded-lg bg-indigo-50">
+                            <div className="flex-shrink-0 w-8 h-8 bg-indigo-500 text-white rounded-full flex items-center justify-center font-bold mr-4">
+                              {index + 1}
+                            </div>
+                            <div className="flex-grow">
+                              <h5 className="font-semibold text-indigo-800">{phase.phase}</h5>
+                              <ul className="mt-2 space-y-1">
+                                {phase.actions.map((action, actionIndex) => (
+                                  <li key={actionIndex} className="text-sm text-gray-700 flex items-center">
+                                    <span className="w-2 h-2 bg-indigo-400 rounded-full mr-2 flex-shrink-0"></span>
+                                    {action}
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* ===================== BOUTON ACTIONS ===================== */}
+                    <div className="mt-8 flex justify-center space-x-4">
+                      <button 
+                        onClick={() => window.print()} 
+                        className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                      >
+                        🖨️ Imprimer Rapport
+                      </button>
+                      <button 
+                        onClick={() => setAuditResults(null)} 
+                        className="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                      >
+                        🔄 Nouvelle Analyse
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
