@@ -1148,25 +1148,30 @@ const AuditSystem = () => {
                         📈 MESURES D'AMÉLIORATION & ROI
                       </h4>
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        {auditResults.improvementMeasures.map((measure, index) => (
+                        {auditResults.improvementMeasures && auditResults.improvementMeasures.map((measure, index) => (
                           <div key={index} className="p-4 border border-green-200 rounded-lg bg-green-50">
-                            <h5 className="font-semibold text-green-800 mb-3">{measure.measure}</h5>
+                            <h5 className="font-semibold text-green-800 mb-3">{measure.measure || 'Mesure non définie'}</h5>
                             <div className="space-y-2 text-sm">
                               <div className="flex justify-between">
                                 <span className="text-gray-600">Économies:</span>
-                                <span className="font-semibold text-green-600">{measure.savings_percentage}%</span>
+                                <span className="font-semibold text-green-600">{measure.savings_percentage || 0}%</span>
                               </div>
                               <div className="flex justify-between">
                                 <span className="text-gray-600">Investissement:</span>
-                                <span className="font-semibold text-blue-600">{measure.cost.toLocaleString()} €</span>
+                                <span className="font-semibold text-blue-600">{(measure.cost || 0).toLocaleString()} €</span>
                               </div>
                               <div className="flex justify-between">
                                 <span className="text-gray-600">Retour:</span>
-                                <span className="font-semibold text-purple-600">{measure.payback_months} mois</span>
+                                <span className="font-semibold text-purple-600">{measure.payback_months || 0} mois</span>
                               </div>
                             </div>
                           </div>
                         ))}
+                        {(!auditResults.improvementMeasures || auditResults.improvementMeasures.length === 0) && (
+                          <div className="col-span-3 text-center text-gray-500 text-sm italic py-8">
+                            Aucune mesure d'amélioration identifiée
+                          </div>
+                        )}
                       </div>
                     </div>
 
